@@ -20,20 +20,6 @@
                ReferencedContainer = "container:Picture Dot Puzzle.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "27E1DD3F1C2203A800B13AA6"
-               BuildableName = "Picture Dot PuzzleTests.xctest"
-               BlueprintName = "Picture Dot PuzzleTests"
-               ReferencedContainer = "container:Picture Dot Puzzle.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -42,16 +28,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "27E1DD3F1C2203A800B13AA6"
-               BuildableName = "Picture Dot PuzzleTests.xctest"
-               BlueprintName = "Picture Dot PuzzleTests"
-               ReferencedContainer = "container:Picture Dot Puzzle.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

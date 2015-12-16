@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		270882251C222AA90076621F /* PDPDotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 270882241C222AA90076621F /* PDPDotView.m */; };
 		27E1DD2D1C2203A800B13AA6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD2C1C2203A800B13AA6 /* main.m */; };
 		27E1DD301C2203A800B13AA6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD2F1C2203A800B13AA6 /* AppDelegate.m */; };
 		27E1DD331C2203A800B13AA6 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD321C2203A800B13AA6 /* ViewController.m */; };
@@ -27,6 +28,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		270882231C222AA90076621F /* PDPDotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PDPDotView.h; sourceTree = "<group>"; };
+		270882241C222AA90076621F /* PDPDotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PDPDotView.m; sourceTree = "<group>"; };
 		27E1DD271C2203A800B13AA6 /* Picture Dot Puzzle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Picture Dot Puzzle.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E1DD2B1C2203A800B13AA6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		27E1DD2C1C2203A800B13AA6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -85,6 +88,8 @@
 				27E1DD2F1C2203A800B13AA6 /* AppDelegate.m */,
 				27E1DD311C2203A800B13AA6 /* ViewController.h */,
 				27E1DD321C2203A800B13AA6 /* ViewController.m */,
+				270882231C222AA90076621F /* PDPDotView.h */,
+				270882241C222AA90076621F /* PDPDotView.m */,
 				27E1DD341C2203A800B13AA6 /* Main.storyboard */,
 				27E1DD371C2203A800B13AA6 /* Images.xcassets */,
 				27E1DD391C2203A800B13AA6 /* LaunchScreen.xib */,
@@ -220,6 +225,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				27E1DD331C2203A800B13AA6 /* ViewController.m in Sources */,
+				270882251C222AA90076621F /* PDPDotView.m in Sources */,
 				27E1DD301C2203A800B13AA6 /* AppDelegate.m in Sources */,
 				27E1DD2D1C2203A800B13AA6 /* main.m in Sources */,
 			);
@@ -418,6 +424,7 @@
 				27E1DD4C1C2203A800B13AA6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		27E1DD4D1C2203A800B13AA6 /* Build configuration list for PBXNativeTarget "Picture Dot PuzzleTests" */ = {
 			isa = XCConfigurationList;
@@ -426,6 +433,7 @@
 				27E1DD4F1C2203A800B13AA6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
