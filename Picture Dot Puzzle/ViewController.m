@@ -74,6 +74,19 @@
     [self updateHeaderToolbar];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    _canBecomeFirstResponder = _hideStatusBar;
+    [self updateHeaderToolbar];
+    [self setNeedsStatusBarAppearanceUpdate];
+    if (_canBecomeFirstResponder) {
+        [self becomeFirstResponder];
+    } else {
+        [self resignFirstResponder];
+    }
+}
+
 
 
 #pragma mark - Subviews
@@ -260,8 +273,6 @@
 }
 
 - (void)shareButtonTouched:(UIBarButtonItem *)shareButton {
-    NSLog(@"Share!");
-    
     self.rootDotContainer.backgroundColor = self.backgroundColor;
     UIImage *exportImage = [self imageFromView:self.rootDotContainer];
     self.rootDotContainer.backgroundColor = [UIColor clearColor];
@@ -436,9 +447,11 @@
                         alpha:&alpha];
     
     if (brightness < 0.5f) {
-        brightness = 0.5f - brightness * 0.5f;
+        brightness = brightness * 0.5f;
+        saturation *= 2.5f;
     } else {
-        brightness = 1.25f - brightness;
+        brightness = 1.0f;
+        saturation *= 0.5f;
     }
     
     saturation *= 0.2f;
