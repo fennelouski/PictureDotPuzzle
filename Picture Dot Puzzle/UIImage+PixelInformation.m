@@ -82,7 +82,7 @@
 }
 
 - (UIColor *)averageBorderColor {
-    NSMutableArray *colors = [NSMutableArray new];
+    NSMutableSet *colors = [NSMutableSet new];
     
     float numberOfDivisions = 10.0f;
     
@@ -149,10 +149,10 @@
     averageBrightness /= colors.count;
     averageAlpha /= 2.0f * colors.count;
     
-    return [UIColor colorWithHue:averageHue
-                      saturation:averageSaturation
-                      brightness:averageBrightness
-                           alpha:averageAlpha];
+    return [UIColor colorWithRed:red
+                           green:green
+                            blue:blue
+                           alpha:alpha];
 }
 
 @end
