@@ -35,6 +35,7 @@
 
 @implementation ViewController {
     BOOL _canBecomeFirstResponder;
+    UIStatusBarStyle _preferredStatusBarStyle;
 }
 
 - (void)viewDidLoad {
@@ -47,6 +48,8 @@
     [self.view addGestureRecognizer:self.screenEdgePanGestureRecognizer];
     [self.view addGestureRecognizer:self.swipeUp];
     [self.view addGestureRecognizer:self.swipeDown];
+    
+    _preferredStatusBarStyle = UIStatusBarStyleDefault;
 }
 
 
@@ -125,7 +128,7 @@
 - (UIBarButtonItem *)resetButton {
     if (!_resetButton) {
         _resetButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Reset", nil)
-                                                        style:UIBarButtonItemStylePlain
+                                                        style:UIBarButtonItemStyleDone
                                                        target:self
                                                        action:@selector(resetButtonTouched:)];
     }
@@ -277,7 +280,54 @@
     
     [self.rootDot layoutSubviews];
     
-    // find image view
+    // find image view colors and assign them
+    CGFloat red = arc4random()%1000 * 0.001f;
+    CGFloat green = arc4random()%1000 * 0.001f;
+    CGFloat blue = arc4random()%1000 * 0.001f;
+    
+    self.backgroundColor = [UIColor colorWithRed:red
+                                           green:green
+                                            blue:blue
+                                           alpha:1.0f];
+    self.accentColor1 = [UIColor colorWithHue:red
+                                   saturation:green
+                                   brightness:blue
+                                        alpha:1.0f];
+    
+    self.inputAccessoryView.barTintColor = self.backgroundColor;
+    self.view.backgroundColor = self.backgroundColor;
+    
+    CGFloat hue, saturation, brightness, alpha;
+    [self.backgroundColor getHue:&hue
+                      saturation:&saturation
+                      brightness:&brightness
+                           alpha:&alpha];
+    if (brightness > 0.5f) {
+        _preferredStatusBarStyle = UIStatusBarStyleDefault;
+    } else {
+        _preferredStatusBarStyle = UIStatusBarStyleLightContent;
+    }
+    
+    [self setNeedsStatusBarAppearanceUpdate];
+    
+    [self.accentColor1 getHue:&hue
+                   saturation:&saturation
+                   brightness:&brightness
+                        alpha:&alpha];
+    for (UIBarButtonItem *barButtonItem in self.inputAccessoryView.items) {
+        if (brightness > 0.5f) {
+            barButtonItem.tintColor = [UIColor colorWithHue:hue
+                                                 saturation:saturation
+                                                 brightness:(1.0f - (brightness - 0.5f)) * 0.5f
+                                                      alpha:1.0f];
+        } else {
+            barButtonItem.tintColor = [UIColor colorWithHue:hue
+                                                 saturation:saturation
+                                                 brightness:1.0f - (1.0f - (brightness + 0.5f)) * 0.5f
+                                                      alpha:1.0f];
+        }
+    }
+    
     
     [picker dismissViewControllerAnimated:YES
                                completion:^{
@@ -290,6 +340,12 @@
 #pragma mark - Navigation Controller Delegate
 
 
+
+#pragma mark - Status Bar
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return _preferredStatusBarStyle;
+}
 
 
 #pragma mark - Memory Warning
