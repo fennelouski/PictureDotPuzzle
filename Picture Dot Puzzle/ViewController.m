@@ -43,14 +43,12 @@
 @implementation ViewController {
     BOOL _canBecomeFirstResponder;
     UIStatusBarStyle _preferredStatusBarStyle;
-    BOOL _showStatusBar;
+    BOOL _hideStatusBar;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
-    _showStatusBar = YES;
     
     if (self.view.frame.size.width > 500.0f) {
         [PDPDataManager sharedDataManager].maximumDivisionLevel = 8;
@@ -191,7 +189,7 @@
     if (!_cornerRadiusSlider) {
         _cornerRadiusSlider = [[UISlider alloc] initWithFrame:CGRectInset(_headerToolbar.bounds, 44.0f, 10.0f)];
         _cornerRadiusSlider.minimumValue = 0.001f;
-        _cornerRadiusSlider.maximumValue = 0.75f;
+        _cornerRadiusSlider.maximumValue = 1.0f;
         _cornerRadiusSlider.value = [[PDPDataManager sharedDataManager] cornerRadius];
         _cornerRadiusSlider.minimumTrackTintColor = [UIColor grayColor];
         _cornerRadiusSlider.maximumTrackTintColor = [UIColor lightGrayColor];
@@ -246,6 +244,9 @@
         [dot removeFromSuperview];
     }
     
+    [[[PDPDataManager sharedDataManager] allDots] removeAllObjects];
+    
+    [self.rootDot removeSubdivisions];
     self.rootDot = nil;
     [self.view addSubview:self.rootDotContainer];
     [self.rootDotContainer addSubview:self.rootDot];
@@ -323,11 +324,11 @@
     if ([swipe locationInView:self.view].y > self.view.frame.size.height - possibleTouchHeight || [swipe locationInView:self.view].y < possibleTouchHeight) {
         if (swipe.direction == UISwipeGestureRecognizerDirectionDown) {
             _canBecomeFirstResponder = NO;
-            _showStatusBar = YES;
+            _hideStatusBar = NO;
             [self resignFirstResponder];
         } else if (swipe.direction == UISwipeGestureRecognizerDirectionUp) {
             _canBecomeFirstResponder = YES;
-            _showStatusBar = NO;
+            _hideStatusBar = YES;
             [self becomeFirstResponder];
         }
         
@@ -340,10 +341,10 @@
 }
 
 - (void)updateHeaderToolbar {
-    if (_showStatusBar) {
-        self.headerToolbar.center = CGPointMake(self.headerToolbar.center.x, -fabs(self.headerToolbar.center.y));
-    } else {
+    if (_hideStatusBar) {
         self.headerToolbar.center = CGPointMake(self.headerToolbar.center.x, fabs(self.headerToolbar.center.y));
+    } else {
+        self.headerToolbar.center = CGPointMake(self.headerToolbar.center.x, -fabs(self.headerToolbar.center.y));
     }
 }
 
@@ -448,7 +449,7 @@
 }
 
 - (BOOL)prefersStatusBarHidden {
-    return !_showStatusBar;
+    return _hideStatusBar;
 }
 
 - (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {

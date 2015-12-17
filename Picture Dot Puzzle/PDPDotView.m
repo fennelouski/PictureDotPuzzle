@@ -44,7 +44,7 @@ static NSInteger const numberOfSubdivisions = 2;
     if (self.isDivided) {
         self.clipsToBounds = NO;
         
-        if (self.divisionLevel < [[PDPDataManager sharedDataManager] maximumDivisionLevel]) {
+        if (self.divisionLevel < [PDPDataManager sharedDataManager].maximumDivisionLevel) {
             [self layoutSubdivisions];
             self.backgroundColor = [UIColor clearColor];
         }
@@ -88,7 +88,6 @@ static NSInteger const numberOfSubdivisions = 2;
         for (int row = 0; row < numberOfSubdivisions; row++) {
             for (int column = 0; column < numberOfSubdivisions; column++) {
                 PDPDotView *dot = [[PDPDotView alloc] initWithFrame:self.frame];
-                [[[PDPDataManager sharedDataManager] allDots] addObject:dot];
                 dot.rootView = self.rootView;
                 
                 [UIView animateWithDuration:[[PDPDataManager sharedDataManager] animationDuration]
@@ -98,10 +97,15 @@ static NSInteger const numberOfSubdivisions = 2;
                                  }];
                 
                 dot.divisionLevel = self.divisionLevel + 1;
+                if (dot.divisionLevel < [PDPDataManager sharedDataManager].maximumDivisionLevel) {
+                    [[[PDPDataManager sharedDataManager] allDots] addObject:dot];
+                }
                 [self.subdivisions addObject:dot];
                 [self.rootView addSubview:dot];
             }
         }
+        
+        [[PDPDataManager sharedDataManager].allDots removeObject:self];
     }
 }
 
@@ -160,6 +164,15 @@ static NSInteger const numberOfSubdivisions = 2;
     }
     self.isDivided = YES;
     [self layoutSubviews];
+}
+
+- (void)removeSubdivisions {
+    for (PDPDotView *dot in self.subdivisions) {
+        [dot removeSubdivisions];
+    }
+    
+    [self removeFromSuperview];
+    [self.subdivisions removeAllObjects];
 }
 
 
