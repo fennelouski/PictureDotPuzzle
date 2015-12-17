@@ -261,6 +261,12 @@
 
 - (void)shareButtonTouched:(UIBarButtonItem *)shareButton {
     NSLog(@"Share!");
+    
+    self.rootDotContainer.backgroundColor = self.backgroundColor;
+    UIImage *exportImage = [self imageFromView:self.rootDotContainer];
+    self.rootDotContainer.backgroundColor = [UIColor clearColor];
+    
+    
 }
 
 - (void)sliderTouched:(UISlider *)slider {
@@ -417,13 +423,13 @@
                                    saturation:1.0f - green
                                    brightness:1.0f - blue
                                         alpha:1.0f];
-
+    
     [self.accentColor1 getHue:&hue
                    saturation:&saturation
                    brightness:&brightness
                         alpha:&alpha];
     
-    if (brightness > 0.5f) {
+    if (brightness < 0.5f) {
         brightness = 0.5f - brightness * 0.5f;
     } else {
         brightness = 1.25f - brightness;
@@ -492,6 +498,39 @@
         }
     }
 }
+
+
+#pragma mark - Image Conversion
+// this should be added as a category on UIView
+
+- (UIImage *)imageFromView:(UIView *) view {
+    CGFloat scale = [self screenScale];
+    
+    if (view.bounds.size.width + view.bounds.size.height > 1200) {
+        scale *= 2;
+    }
+    
+    if (scale > 1) {
+        UIGraphicsBeginImageContextWithOptions(view.bounds.size, NO, scale);
+    } else {
+        UIGraphicsBeginImageContext(view.bounds.size);
+    }
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [view.layer renderInContext: context];
+    UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return viewImage;
+}
+
+- (float)screenScale {
+    if ([ [UIScreen mainScreen] respondsToSelector: @selector(scale)] == YES) {
+        return [ [UIScreen mainScreen] scale];
+    }
+    return 1;
+}
+
 
 
 #pragma mark - Memory Warning
