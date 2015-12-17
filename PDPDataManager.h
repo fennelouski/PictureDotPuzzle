@@ -19,4 +19,9 @@
 
 @property (nonatomic) NSTimeInterval animationDuration;
 
+@property (nonatomic, strong) NSMutableSet *allDots;
+
+- (NSInteger)maximumDivisionLevel;
+- (void)setMaximumDivisionLevel:(NSInteger)maximumDivisionLevel;
+
 @end
