@@ -10,4 +10,10 @@
 
 @interface PDPDotView : UIView
 
+@property (nonatomic) BOOL isDivided;
+
+@property (nonatomic, strong) UIView *rootView;
+
+@property (nonatomic) NSInteger divisionLevel;
+
 @end
