@@ -7,7 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface PDPDataManager : NSObject
+
++ (instancetype)sharedDataManager;
+
+@property (nonatomic, strong) UIImage *image;
+
+@property (nonatomic) float cornerRadius;
+
+@property (nonatomic) NSTimeInterval animationDuration;
 
 @end
