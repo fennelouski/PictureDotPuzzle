@@ -26,4 +26,7 @@
            saturationDeltaFactor:(CGFloat)saturationDeltaFactor
                        maskImage:(UIImage *)maskImage
                          atFrame:(CGRect)frame;
++ (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize;
+- scaleToSize:(CGSize)newSize;
+
 @end

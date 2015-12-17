@@ -7,11 +7,13 @@
 //
 
 #import "PDPDataManager.h"
+#import "UIImage+BlurredFrame.h"
 
 static NSString * const animationDurationKey = @"Animation Duration K£y";
 
 @implementation PDPDataManager {
     NSInteger _maximumDivisionLevel;
+    UIImage *_image;
 }
 
 + (instancetype)sharedDataManager {
@@ -51,4 +53,22 @@ static NSString * const animationDurationKey = @"Animation Duration K£y";
 - (void)setMaximumDivisionLevel:(NSInteger)maximumDivisionLevel {
     _maximumDivisionLevel = maximumDivisionLevel;
 }
+
+- (UIImage *)image {
+    return _image;
+}
+
+- (void)setImage:(UIImage *)image {
+    _image = image;
+    
+    if (_image.size.width > [UIScreen mainScreen].bounds.size.width) {
+        _image = [UIImage imageWithImage:image scaledToSize:CGSizeMake([UIScreen mainScreen].bounds.size.width,
+                                                                       [UIScreen mainScreen].bounds.size.width)];
+    }
+}
+
+
+
+
+
 @end

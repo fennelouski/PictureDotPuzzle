@@ -13,7 +13,6 @@
 
 + (instancetype)sharedDataManager;
 
-@property (nonatomic, strong) UIImage *image;
 
 @property (nonatomic) float cornerRadius;
 
@@ -23,5 +22,8 @@
 
 - (NSInteger)maximumDivisionLevel;
 - (void)setMaximumDivisionLevel:(NSInteger)maximumDivisionLevel;
+
+- (UIImage *)image;
+- (void)setImage:(UIImage *)image;
 
 @end

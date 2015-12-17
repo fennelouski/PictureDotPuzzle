@@ -52,8 +52,12 @@
     
     if (self.view.frame.size.width > 500.0f) {
         [PDPDataManager sharedDataManager].maximumDivisionLevel = 8;
-    } else if (self.view.frame.size.height > 400.0f) {
+    } else if (self.view.frame.size.width > 400.0f) {
         [PDPDataManager sharedDataManager].maximumDivisionLevel = 7;
+    } else if (self.view.frame.size.width > 300.0f) {
+        [PDPDataManager sharedDataManager].maximumDivisionLevel = 6;
+    } else {
+        [PDPDataManager sharedDataManager].maximumDivisionLevel = 5;
     }
     
     [self.view addSubview:self.backgroundImageView];
