@@ -10,6 +10,8 @@
 		270882251C222AA90076621F /* PDPDotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 270882241C222AA90076621F /* PDPDotView.m */; };
 		277F4D981C223F2E0015710E /* PDPDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 277F4D971C223F2E0015710E /* PDPDataManager.m */; };
 		277F4D9A1C2240CE0015710E /* 13 Rose.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 277F4D991C2240CE0015710E /* 13 Rose.jpg */; };
+		277F4D9D1C225F360015710E /* UIImage+PixelInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 277F4D9C1C225F360015710E /* UIImage+PixelInformation.m */; };
+		277F4DA01C2265C10015710E /* PDPTouchInterceptView.m in Sources */ = {isa = PBXBuildFile; fileRef = 277F4D9F1C2265C10015710E /* PDPTouchInterceptView.m */; };
 		27E1DD2D1C2203A800B13AA6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD2C1C2203A800B13AA6 /* main.m */; };
 		27E1DD301C2203A800B13AA6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD2F1C2203A800B13AA6 /* AppDelegate.m */; };
 		27E1DD331C2203A800B13AA6 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD321C2203A800B13AA6 /* ViewController.m */; };
@@ -35,6 +37,10 @@
 		277F4D961C223F2E0015710E /* PDPDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PDPDataManager.h; path = "Picture Dot Puzzle.xcodeproj/../PDPDataManager.h"; sourceTree = SOURCE_ROOT; };
 		277F4D971C223F2E0015710E /* PDPDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PDPDataManager.m; path = "Picture Dot Puzzle.xcodeproj/../PDPDataManager.m"; sourceTree = SOURCE_ROOT; };
 		277F4D991C2240CE0015710E /* 13 Rose.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "13 Rose.jpg"; sourceTree = "<group>"; };
+		277F4D9B1C225F360015710E /* UIImage+PixelInformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+PixelInformation.h"; sourceTree = "<group>"; };
+		277F4D9C1C225F360015710E /* UIImage+PixelInformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+PixelInformation.m"; sourceTree = "<group>"; };
+		277F4D9E1C2265C10015710E /* PDPTouchInterceptView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PDPTouchInterceptView.h; path = "Picture Dot Puzzle.xcodeproj/../PDPTouchInterceptView.h"; sourceTree = SOURCE_ROOT; };
+		277F4D9F1C2265C10015710E /* PDPTouchInterceptView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PDPTouchInterceptView.m; path = "Picture Dot Puzzle.xcodeproj/../PDPTouchInterceptView.m"; sourceTree = SOURCE_ROOT; };
 		27E1DD271C2203A800B13AA6 /* Picture Dot Puzzle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Picture Dot Puzzle.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E1DD2B1C2203A800B13AA6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		27E1DD2C1C2203A800B13AA6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -97,6 +103,10 @@
 				270882241C222AA90076621F /* PDPDotView.m */,
 				277F4D961C223F2E0015710E /* PDPDataManager.h */,
 				277F4D971C223F2E0015710E /* PDPDataManager.m */,
+				277F4D9B1C225F360015710E /* UIImage+PixelInformation.h */,
+				277F4D9C1C225F360015710E /* UIImage+PixelInformation.m */,
+				277F4D9E1C2265C10015710E /* PDPTouchInterceptView.h */,
+				277F4D9F1C2265C10015710E /* PDPTouchInterceptView.m */,
 				27E1DD341C2203A800B13AA6 /* Main.storyboard */,
 				27E1DD371C2203A800B13AA6 /* Images.xcassets */,
 				27E1DD391C2203A800B13AA6 /* LaunchScreen.xib */,
@@ -234,6 +244,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				277F4D981C223F2E0015710E /* PDPDataManager.m in Sources */,
+				277F4D9D1C225F360015710E /* UIImage+PixelInformation.m in Sources */,
+				277F4DA01C2265C10015710E /* PDPTouchInterceptView.m in Sources */,
 				27E1DD331C2203A800B13AA6 /* ViewController.m in Sources */,
 				270882251C222AA90076621F /* PDPDotView.m in Sources */,
 				27E1DD301C2203A800B13AA6 /* AppDelegate.m in Sources */,
