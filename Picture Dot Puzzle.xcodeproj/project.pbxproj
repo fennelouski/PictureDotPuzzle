@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		270882251C222AA90076621F /* PDPDotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 270882241C222AA90076621F /* PDPDotView.m */; };
+		274C45941C22836100CD8E2F /* UIImage+BlurredFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 274C45911C22836100CD8E2F /* UIImage+BlurredFrame.m */; };
+		274C45951C22836100CD8E2F /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 274C45931C22836100CD8E2F /* UIImage+ImageEffects.m */; };
 		277F4D981C223F2E0015710E /* PDPDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 277F4D971C223F2E0015710E /* PDPDataManager.m */; };
 		277F4D9A1C2240CE0015710E /* 13 Rose.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 277F4D991C2240CE0015710E /* 13 Rose.jpg */; };
 		277F4D9D1C225F360015710E /* UIImage+PixelInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 277F4D9C1C225F360015710E /* UIImage+PixelInformation.m */; };
@@ -34,6 +36,10 @@
 /* Begin PBXFileReference section */
 		270882231C222AA90076621F /* PDPDotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PDPDotView.h; sourceTree = "<group>"; };
 		270882241C222AA90076621F /* PDPDotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PDPDotView.m; sourceTree = "<group>"; };
+		274C45901C22836100CD8E2F /* UIImage+BlurredFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+BlurredFrame.h"; sourceTree = "<group>"; };
+		274C45911C22836100CD8E2F /* UIImage+BlurredFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+BlurredFrame.m"; sourceTree = "<group>"; };
+		274C45921C22836100CD8E2F /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageEffects.h"; sourceTree = "<group>"; };
+		274C45931C22836100CD8E2F /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageEffects.m"; sourceTree = "<group>"; };
 		277F4D961C223F2E0015710E /* PDPDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PDPDataManager.h; path = "Picture Dot Puzzle.xcodeproj/../PDPDataManager.h"; sourceTree = SOURCE_ROOT; };
 		277F4D971C223F2E0015710E /* PDPDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PDPDataManager.m; path = "Picture Dot Puzzle.xcodeproj/../PDPDataManager.m"; sourceTree = SOURCE_ROOT; };
 		277F4D991C2240CE0015710E /* 13 Rose.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "13 Rose.jpg"; sourceTree = "<group>"; };
@@ -107,6 +113,10 @@
 				277F4D9C1C225F360015710E /* UIImage+PixelInformation.m */,
 				277F4D9E1C2265C10015710E /* PDPTouchInterceptView.h */,
 				277F4D9F1C2265C10015710E /* PDPTouchInterceptView.m */,
+				274C45901C22836100CD8E2F /* UIImage+BlurredFrame.h */,
+				274C45911C22836100CD8E2F /* UIImage+BlurredFrame.m */,
+				274C45921C22836100CD8E2F /* UIImage+ImageEffects.h */,
+				274C45931C22836100CD8E2F /* UIImage+ImageEffects.m */,
 				27E1DD341C2203A800B13AA6 /* Main.storyboard */,
 				27E1DD371C2203A800B13AA6 /* Images.xcassets */,
 				27E1DD391C2203A800B13AA6 /* LaunchScreen.xib */,
@@ -243,10 +253,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				274C45941C22836100CD8E2F /* UIImage+BlurredFrame.m in Sources */,
 				277F4D981C223F2E0015710E /* PDPDataManager.m in Sources */,
 				277F4D9D1C225F360015710E /* UIImage+PixelInformation.m in Sources */,
 				277F4DA01C2265C10015710E /* PDPTouchInterceptView.m in Sources */,
 				27E1DD331C2203A800B13AA6 /* ViewController.m in Sources */,
+				274C45951C22836100CD8E2F /* UIImage+ImageEffects.m in Sources */,
 				270882251C222AA90076621F /* PDPDotView.m in Sources */,
 				27E1DD301C2203A800B13AA6 /* AppDelegate.m in Sources */,
 				27E1DD2D1C2203A800B13AA6 /* main.m in Sources */,
