@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		270882251C222AA90076621F /* PDPDotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 270882241C222AA90076621F /* PDPDotView.m */; };
+		277F4D981C223F2E0015710E /* PDPDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 277F4D971C223F2E0015710E /* PDPDataManager.m */; };
+		277F4D9A1C2240CE0015710E /* 13 Rose.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 277F4D991C2240CE0015710E /* 13 Rose.jpg */; };
 		27E1DD2D1C2203A800B13AA6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD2C1C2203A800B13AA6 /* main.m */; };
 		27E1DD301C2203A800B13AA6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD2F1C2203A800B13AA6 /* AppDelegate.m */; };
 		27E1DD331C2203A800B13AA6 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD321C2203A800B13AA6 /* ViewController.m */; };
@@ -30,6 +32,9 @@
 /* Begin PBXFileReference section */
 		270882231C222AA90076621F /* PDPDotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PDPDotView.h; sourceTree = "<group>"; };
 		270882241C222AA90076621F /* PDPDotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PDPDotView.m; sourceTree = "<group>"; };
+		277F4D961C223F2E0015710E /* PDPDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PDPDataManager.h; path = "Picture Dot Puzzle.xcodeproj/../PDPDataManager.h"; sourceTree = SOURCE_ROOT; };
+		277F4D971C223F2E0015710E /* PDPDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PDPDataManager.m; path = "Picture Dot Puzzle.xcodeproj/../PDPDataManager.m"; sourceTree = SOURCE_ROOT; };
+		277F4D991C2240CE0015710E /* 13 Rose.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "13 Rose.jpg"; sourceTree = "<group>"; };
 		27E1DD271C2203A800B13AA6 /* Picture Dot Puzzle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Picture Dot Puzzle.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E1DD2B1C2203A800B13AA6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		27E1DD2C1C2203A800B13AA6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -90,6 +95,8 @@
 				27E1DD321C2203A800B13AA6 /* ViewController.m */,
 				270882231C222AA90076621F /* PDPDotView.h */,
 				270882241C222AA90076621F /* PDPDotView.m */,
+				277F4D961C223F2E0015710E /* PDPDataManager.h */,
+				277F4D971C223F2E0015710E /* PDPDataManager.m */,
 				27E1DD341C2203A800B13AA6 /* Main.storyboard */,
 				27E1DD371C2203A800B13AA6 /* Images.xcassets */,
 				27E1DD391C2203A800B13AA6 /* LaunchScreen.xib */,
@@ -101,6 +108,7 @@
 		27E1DD2A1C2203A800B13AA6 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				277F4D991C2240CE0015710E /* 13 Rose.jpg */,
 				27E1DD2B1C2203A800B13AA6 /* Info.plist */,
 				27E1DD2C1C2203A800B13AA6 /* main.m */,
 			);
@@ -207,6 +215,7 @@
 				27E1DD361C2203A800B13AA6 /* Main.storyboard in Resources */,
 				27E1DD3B1C2203A800B13AA6 /* LaunchScreen.xib in Resources */,
 				27E1DD381C2203A800B13AA6 /* Images.xcassets in Resources */,
+				277F4D9A1C2240CE0015710E /* 13 Rose.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,6 +233,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				277F4D981C223F2E0015710E /* PDPDataManager.m in Sources */,
 				27E1DD331C2203A800B13AA6 /* ViewController.m in Sources */,
 				270882251C222AA90076621F /* PDPDotView.m in Sources */,
 				27E1DD301C2203A800B13AA6 /* AppDelegate.m in Sources */,
