@@ -266,7 +266,13 @@
     UIImage *exportImage = [self imageFromView:self.rootDotContainer];
     self.rootDotContainer.backgroundColor = [UIColor clearColor];
     
-    
+    NSArray *activityItems = @[exportImage];
+    UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:activityItems
+                                                                             applicationActivities:nil];
+    activityVC.popoverPresentationController.barButtonItem = self.shareButton;
+    [self presentViewController:activityVC
+                       animated:YES
+                     completion:nil];
 }
 
 - (void)sliderTouched:(UISlider *)slider {
