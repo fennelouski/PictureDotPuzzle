@@ -9,12 +9,16 @@
 #import "ViewController.h"
 #import "PDPDotView.h"
 #import "PDPDataManager.h"
+#import "PDPTouchInterceptView.h"
+#import "UIImage+PixelInformation.h"
 
-@interface ViewController ()  <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+@interface ViewController ()  <UIImagePickerControllerDelegate, UINavigationControllerDelegate, PDPTouchInterceptViewDelegate>
 
 @property (nonatomic, strong) NSMutableArray *dots;
 
 @property (nonatomic) NSInteger numberOfRows, numberOfColumns;
+
+@property (nonatomic, strong) PDPTouchInterceptView *interceptView;
 
 @property (nonatomic, strong) UIView *rootDotContainer;
 @property (nonatomic, strong) PDPDotView *rootDot;
@@ -27,6 +31,9 @@
 @property (nonatomic, strong) UIBarButtonItem *flexibleSpace;
 @property (nonatomic, strong) UIBarButtonItem *shareButton, *hideButton, *resetButton, *photoButton;
 
+@property (nonatomic, strong) UIToolbar *headerToolbar;
+@property (nonatomic, strong) UISlider *cornerRadiusSlider;
+
 @property (nonatomic, strong) UIImagePickerController *imagePicker;
 
 @property (nonatomic, strong) UIImageView *backgroundImageView;
@@ -36,11 +43,18 @@
 @implementation ViewController {
     BOOL _canBecomeFirstResponder;
     UIStatusBarStyle _preferredStatusBarStyle;
+    BOOL _showStatusBar;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    
+    if (self.view.frame.size.width > 500.0f) {
+        [PDPDataManager sharedDataManager].maximumDivisionLevel = 8;
+    } else if (self.view.frame.size.height > 400.0f) {
+        [PDPDataManager sharedDataManager].maximumDivisionLevel = 7;
+    }
     
     [self.view addSubview:self.backgroundImageView];
     [self.view addSubview:self.rootDotContainer];
@@ -66,6 +80,15 @@
     return _backgroundImageView;
 }
 
+- (PDPTouchInterceptView *)interceptView {
+    if (!_interceptView) {
+        _interceptView.delegate = self;
+        _interceptView = [[PDPTouchInterceptView alloc] initWithFrame:self.rootDotContainer.bounds];
+    }
+    
+    return _interceptView;
+}
+
 - (UIView *)rootDotContainer {
     if (!_rootDotContainer) {
         _rootDotContainer = [[UIView alloc] initWithFrame:CGRectMake(0.0f,
@@ -74,6 +97,7 @@
                                                                      self.view.frame.size.width)];
         _rootDotContainer.center = self.view.center;
         [_rootDotContainer addSubview:self.rootDot];
+        [_rootDotContainer addSubview:self.interceptView];
     }
     
     return _rootDotContainer;
@@ -81,8 +105,8 @@
 
 - (PDPDotView *)rootDot {
     if (!_rootDot) {
-        NSLog(@"Creating!");
         _rootDot = [[PDPDotView alloc] initWithFrame:self.rootDotContainer.bounds];
+        [[[PDPDataManager sharedDataManager] allDots] addObject:_rootDot];
         _rootDot.rootView = _rootDot;
     }
     
@@ -148,6 +172,16 @@
 
 
 
+- (UIToolbar *)headerToolbar {
+    if (!_headerToolbar) {
+        _headerToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.frame.size.width, 44.0f)];
+        [_headerToolbar addSubview:self.cornerRadiusSlider];
+    }
+    
+    return _headerToolbar;
+}
+
+
 #pragma mark - View Controllers
 
 - (UIImagePickerController *)imagePicker {
@@ -186,13 +220,13 @@
     [subviews addObjectsFromArray:self.rootDotContainer.subviews];
     
     for (PDPDotView *dot in subviews) {
-        NSLog(@"Dot!");
         [dot removeFromSuperview];
     }
     
     self.rootDot = nil;
     [self.view addSubview:self.rootDotContainer];
     [self.rootDotContainer addSubview:self.rootDot];
+    [self.rootDotContainer addSubview:self.interceptView];
     self.rootDot.isDivided = NO;
     [self.rootDot layoutSubviews];
 }
@@ -276,37 +310,53 @@
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
     
+    [self updateBackgroundColorWithImage:image];
+    
+    [picker dismissViewControllerAnimated:YES
+                               completion:^{
+                                   
+                               }];
+}
+
+- (void)updateBackgroundColorWithImage:(UIImage *)image {
     [[PDPDataManager sharedDataManager] setImage:image];
     
     [self.rootDot layoutSubviews];
     
-    // find image view colors and assign them
-    CGFloat red = arc4random()%1000 * 0.001f;
-    CGFloat green = arc4random()%1000 * 0.001f;
-    CGFloat blue = arc4random()%1000 * 0.001f;
     
-    self.backgroundColor = [UIColor colorWithRed:red
-                                           green:green
-                                            blue:blue
-                                           alpha:1.0f];
-    self.accentColor1 = [UIColor colorWithHue:red
-                                   saturation:green
-                                   brightness:blue
+    self.backgroundColor = [[[PDPDataManager sharedDataManager] image] averageBorderColor];
+    
+    CGFloat red, green, blue, alpha;
+    
+    [self.backgroundColor getRed:&red
+                           green:&green
+                            blue:&blue
+                           alpha:&alpha];
+    self.accentColor1 = [UIColor colorWithHue:1.0f - red
+                                   saturation:1.0f - green
+                                   brightness:1.0f - blue
                                         alpha:1.0f];
     
     self.inputAccessoryView.barTintColor = self.backgroundColor;
     self.view.backgroundColor = self.backgroundColor;
     
-    CGFloat hue, saturation, brightness, alpha;
+    CGFloat hue, saturation, brightness;
     [self.backgroundColor getHue:&hue
                       saturation:&saturation
                       brightness:&brightness
                            alpha:&alpha];
     if (brightness > 0.5f) {
+        brightness = 1.0f - (1.0f - brightness) * 0.5f;
         _preferredStatusBarStyle = UIStatusBarStyleDefault;
     } else {
+        brightness *= 0.5f;
         _preferredStatusBarStyle = UIStatusBarStyleLightContent;
     }
+    
+    self.backgroundColor = [UIColor colorWithHue:hue
+                                      saturation:saturation
+                                      brightness:brightness
+                                           alpha:alpha];
     
     [self setNeedsStatusBarAppearanceUpdate];
     
@@ -318,23 +368,16 @@
         if (brightness > 0.5f) {
             barButtonItem.tintColor = [UIColor colorWithHue:hue
                                                  saturation:saturation
-                                                 brightness:(1.0f - (brightness - 0.5f)) * 0.5f
+                                                 brightness:1.0f - brightness
                                                       alpha:1.0f];
         } else {
             barButtonItem.tintColor = [UIColor colorWithHue:hue
                                                  saturation:saturation
-                                                 brightness:1.0f - (1.0f - (brightness + 0.5f)) * 0.5f
+                                                 brightness:1.0f - brightness
                                                       alpha:1.0f];
         }
     }
-    
-    
-    [picker dismissViewControllerAnimated:YES
-                               completion:^{
-                                   
-                               }];
 }
-
 
 
 #pragma mark - Navigation Controller Delegate
@@ -345,6 +388,47 @@
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return _preferredStatusBarStyle;
+}
+
+- (BOOL)prefersStatusBarHidden {
+    return !_showStatusBar;
+}
+
+- (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {
+    return UIStatusBarAnimationSlide;
+}
+
+
+#pragma mark - Measuring Touches
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:touch.view];
+    
+    NSArray *allDots = [[[PDPDataManager sharedDataManager] allDots] allObjects];
+    for (PDPDotView *dot in allDots) {
+        if (CGRectContainsPoint(dot.frame, touchLocation)) {
+            if ([dot respondsToSelector:@selector(isDivided)] && !dot.isDivided) {
+                dot.isDivided = YES;
+                [dot layoutSubviews];
+            }
+        }
+    }
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:touch.view];
+    
+    NSArray *allDots = [[[PDPDataManager sharedDataManager] allDots] allObjects];
+    for (PDPDotView *dot in allDots) {
+        if (CGRectContainsPoint(dot.frame, touchLocation)) {
+            if ([dot respondsToSelector:@selector(isDivided)] && !dot.isDivided) {
+                dot.isDivided = YES;
+                [dot layoutSubviews];
+            }
+        }
+    }
 }
 
 

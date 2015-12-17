@@ -8,6 +8,7 @@
 
 #import "PDPDotView.h"
 #import "PDPDataManager.h"
+#import "UIImage+PixelInformation.h"
 
 @interface PDPDotView ()
 
@@ -21,9 +22,19 @@
 
 static NSInteger const numberOfSubdivisions = 2;
 
-static NSInteger const maximumDivisionLevel = 7;
-
 @implementation PDPDotView
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    
+    if (self) {
+        [self addTarget:self
+                 action:@selector(dragged:)
+       forControlEvents:UIControlEventTouchDragEnter | UIControlEventTouchDragExit];
+    }
+    
+    return self;
+}
 
 - (void)layoutSubviews {
     [super layoutSubviews];
@@ -33,7 +44,7 @@ static NSInteger const maximumDivisionLevel = 7;
     if (self.isDivided) {
         self.clipsToBounds = NO;
         
-        if (self.divisionLevel < maximumDivisionLevel) {
+        if (self.divisionLevel < [[PDPDataManager sharedDataManager] maximumDivisionLevel]) {
             [self layoutSubdivisions];
             self.backgroundColor = [UIColor clearColor];
         }
@@ -67,10 +78,7 @@ static NSInteger const maximumDivisionLevel = 7;
     CGPoint actualCenter = CGPointMake(relativeCenter.x * sourceImage.size.width,
                                        relativeCenter.y * sourceImage.size.height);
     
-    return [UIColor colorWithRed:relativeCenter.x
-                           green:relativeCenter.y
-                            blue:relativeCenter.x * 0.5f + relativeCenter.y * 0.5f
-                           alpha:1.0f];
+    return [[[PDPDataManager sharedDataManager] image] colorAtPixel:actualCenter];
 }
 
 - (void)layoutSubdivisions {
@@ -80,6 +88,7 @@ static NSInteger const maximumDivisionLevel = 7;
         for (int row = 0; row < numberOfSubdivisions; row++) {
             for (int column = 0; column < numberOfSubdivisions; column++) {
                 PDPDotView *dot = [[PDPDotView alloc] initWithFrame:self.frame];
+                [[[PDPDataManager sharedDataManager] allDots] addObject:dot];
                 dot.rootView = self.rootView;
                 
                 [UIView animateWithDuration:[[PDPDataManager sharedDataManager] animationDuration]
@@ -145,4 +154,18 @@ static NSInteger const maximumDivisionLevel = 7;
     [self layoutSubviews];
 }
 
+- (void)dragged:(id)sender {
+    if (self.isDivided) {
+        return;
+    }
+    self.isDivided = YES;
+    [self layoutSubviews];
+}
+
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:touch.view];
+    NSLog(@"Inside Dot: %f - %f", touchLocation.x, touchLocation.y);
+}
 @end

@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PDPDotView : UIView
+@interface PDPDotView : UIButton
 
 @property (nonatomic) BOOL isDivided;
 
