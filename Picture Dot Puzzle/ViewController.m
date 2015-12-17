@@ -50,6 +50,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
+    _showStatusBar = YES;
+    
     if (self.view.frame.size.width > 500.0f) {
         [PDPDataManager sharedDataManager].maximumDivisionLevel = 8;
     } else if (self.view.frame.size.height > 400.0f) {
@@ -58,12 +60,16 @@
     
     [self.view addSubview:self.backgroundImageView];
     [self.view addSubview:self.rootDotContainer];
+    [self.view addSubview:self.headerToolbar];
     _canBecomeFirstResponder = YES;
     [self.view addGestureRecognizer:self.screenEdgePanGestureRecognizer];
     [self.view addGestureRecognizer:self.swipeUp];
     [self.view addGestureRecognizer:self.swipeDown];
     
     _preferredStatusBarStyle = UIStatusBarStyleDefault;
+    [self updateBackgroundColorWithImage:[PDPDataManager sharedDataManager].image];
+    
+    [self updateHeaderToolbar];
 }
 
 
@@ -181,6 +187,23 @@
     return _headerToolbar;
 }
 
+- (UISlider *)cornerRadiusSlider {
+    if (!_cornerRadiusSlider) {
+        _cornerRadiusSlider = [[UISlider alloc] initWithFrame:CGRectInset(_headerToolbar.bounds, 44.0f, 10.0f)];
+        _cornerRadiusSlider.minimumValue = 0.001f;
+        _cornerRadiusSlider.maximumValue = 0.75f;
+        _cornerRadiusSlider.value = [[PDPDataManager sharedDataManager] cornerRadius];
+        _cornerRadiusSlider.minimumTrackTintColor = [UIColor grayColor];
+        _cornerRadiusSlider.maximumTrackTintColor = [UIColor lightGrayColor];
+        [_cornerRadiusSlider addTarget:self
+                                action:@selector(sliderTouched:)
+                      forControlEvents:UIControlEventAllEvents];
+        
+    }
+    
+    return _cornerRadiusSlider;
+}
+
 
 #pragma mark - View Controllers
 
@@ -235,6 +258,16 @@
     NSLog(@"Share!");
 }
 
+- (void)sliderTouched:(UISlider *)slider {
+    if ([slider isEqual:self.cornerRadiusSlider]) {
+        [PDPDataManager sharedDataManager].cornerRadius = slider.value;
+        if (slider.value > 0.45 && slider.value < 0.55f) {
+            [PDPDataManager sharedDataManager].cornerRadius = 0.5f;
+        }
+    }
+}
+
+
 
 
 #pragma mark - First Responder
@@ -286,14 +319,32 @@
 }
 
 - (void)swiped:(UISwipeGestureRecognizer *)swipe {
-    if (swipe.direction == UISwipeGestureRecognizerDirectionDown) {
-        _canBecomeFirstResponder = NO;
-        [self resignFirstResponder];
-    } else if (swipe.direction == UISwipeGestureRecognizerDirectionUp) {
-        _canBecomeFirstResponder = YES;
-        [self becomeFirstResponder];
+    CGFloat possibleTouchHeight = (self.view.frame.size.height - self.view.frame.size.width) * 0.5f;
+    if ([swipe locationInView:self.view].y > self.view.frame.size.height - possibleTouchHeight || [swipe locationInView:self.view].y < possibleTouchHeight) {
+        if (swipe.direction == UISwipeGestureRecognizerDirectionDown) {
+            _canBecomeFirstResponder = NO;
+            _showStatusBar = YES;
+            [self resignFirstResponder];
+        } else if (swipe.direction == UISwipeGestureRecognizerDirectionUp) {
+            _canBecomeFirstResponder = YES;
+            _showStatusBar = NO;
+            [self becomeFirstResponder];
+        }
+        
+        [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
+                         animations:^{
+                             [self setNeedsStatusBarAppearanceUpdate];
+                             [self updateHeaderToolbar];
+                         }];
     }
-    
+}
+
+- (void)updateHeaderToolbar {
+    if (_showStatusBar) {
+        self.headerToolbar.center = CGPointMake(self.headerToolbar.center.x, -fabs(self.headerToolbar.center.y));
+    } else {
+        self.headerToolbar.center = CGPointMake(self.headerToolbar.center.x, fabs(self.headerToolbar.center.y));
+    }
 }
 
 
@@ -332,12 +383,9 @@
                            green:&green
                             blue:&blue
                            alpha:&alpha];
-    self.accentColor1 = [UIColor colorWithHue:1.0f - red
-                                   saturation:1.0f - green
-                                   brightness:1.0f - blue
-                                        alpha:1.0f];
     
     self.inputAccessoryView.barTintColor = self.backgroundColor;
+    self.headerToolbar.barTintColor = self.inputAccessoryView.barTintColor;
     self.view.backgroundColor = self.backgroundColor;
     
     CGFloat hue, saturation, brightness;
@@ -360,22 +408,31 @@
     
     [self setNeedsStatusBarAppearanceUpdate];
     
+    self.accentColor1 = [UIColor colorWithHue:1.0f - red
+                                   saturation:1.0f - green
+                                   brightness:1.0f - blue
+                                        alpha:1.0f];
+
     [self.accentColor1 getHue:&hue
                    saturation:&saturation
                    brightness:&brightness
                         alpha:&alpha];
+    
+    if (brightness > 0.5f) {
+        brightness = 0.5f - brightness * 0.5f;
+    } else {
+        brightness = 1.25f - brightness;
+    }
+    
+    saturation *= 0.2f;
+    
+    self.accentColor1 = [UIColor colorWithHue:hue
+                                   saturation:saturation * 0.5f
+                                   brightness:brightness
+                                        alpha:1.0f];
+
     for (UIBarButtonItem *barButtonItem in self.inputAccessoryView.items) {
-        if (brightness > 0.5f) {
-            barButtonItem.tintColor = [UIColor colorWithHue:hue
-                                                 saturation:saturation
-                                                 brightness:1.0f - brightness
-                                                      alpha:1.0f];
-        } else {
-            barButtonItem.tintColor = [UIColor colorWithHue:hue
-                                                 saturation:saturation
-                                                 brightness:1.0f - brightness
-                                                      alpha:1.0f];
-        }
+        barButtonItem.tintColor = self.accentColor1;
     }
 }
 
