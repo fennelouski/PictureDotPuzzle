@@ -609,12 +609,17 @@ static CGFloat const toolbarHeight = 44.0f;
         [_recentTouchLocations removeAllObjects];
     }
     
-    NSTimeInterval duration = 12.0f;
+    NSTimeInterval duration = [PDPDataManager sharedDataManager].automationDuration;
     
-    for (NSTimeInterval t = 0.0f; t < duration; t += 0.01f) {
+    
+    for (NSTimeInterval t = [PDPDataManager sharedDataManager].animationDuration, timeAddition = [PDPDataManager sharedDataManager].animationDuration; t < duration; t += timeAddition) {
         [self performSelector:@selector(touchAtRandom)
                    withObject:nil
                    afterDelay:t];
+        
+        if (timeAddition > 0.05f) {
+            timeAddition -= 0.05f;
+        }
     }
     
     [self performSelector:@selector(finishTouches)
@@ -639,7 +644,11 @@ static CGFloat const toolbarHeight = 44.0f;
 }
 
 - (void)finishTouches {
-    NSTimeInterval t = 0.0f;
+    if (!_automating) {
+        return;
+    }
+    
+    NSTimeInterval t = [PDPDataManager sharedDataManager].animationDuration;
     
     BOOL didFindUndividedDot = NO;
     
@@ -647,28 +656,19 @@ static CGFloat const toolbarHeight = 44.0f;
         return obj1.divisionLevel > obj2.divisionLevel;
     }];
     
-    for (int i = 0; i < allDots.count && i < 16; i++) {
+    float groupSize = 16;
+    
+    for (float i = 0; i < allDots.count && i < groupSize; i++) {
         PDPDotView *dot = [allDots objectAtIndex:i];
         
         if (!dot.isDivided) {
             dot.isDivided = YES;
             [dot layoutSubviews];
-        }
-    }
-    
-    for (PDPDotView *dot in allDots) {
-        if (!dot.isDivided) {
-//            dot.isDivided = YES;
             
-//            [dot performSelector:@selector(layoutSubviews)
-//                      withObject:nil
-//                      afterDelay:t];
-//            t += 0.01f;
-            
-            if (!didFindUndividedDot) {
-                didFindUndividedDot = YES;
-                break;
-            }
+            [dot performSelector:@selector(layoutSubviews)
+                      withObject:nil
+                      afterDelay:(t/groupSize) * i];
+            didFindUndividedDot = YES;
         }
     }
     
