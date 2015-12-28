@@ -12,6 +12,8 @@
 #import "PDPTouchInterceptView.h"
 #import "UIImage+PixelInformation.h"
 
+static CGFloat const toolbarHeight = 44.0f;
+
 @interface ViewController ()  <UIImagePickerControllerDelegate, UINavigationControllerDelegate, PDPTouchInterceptViewDelegate>
 
 @property (nonatomic, strong) NSMutableArray *dots;
@@ -25,11 +27,12 @@
 
 @property (nonatomic, strong) UIScreenEdgePanGestureRecognizer *screenEdgePanGestureRecognizer;
 @property (nonatomic, strong) UISwipeGestureRecognizer *swipeDown, *swipeUp;
+@property (nonatomic, strong) UITapGestureRecognizer *tap;
 
 
-@property (nonatomic, strong) UIToolbar *inputAccessoryView;
+@property (nonatomic, strong) UIToolbar *footerToolbar;
 @property (nonatomic, strong) UIBarButtonItem *flexibleSpace;
-@property (nonatomic, strong) UIBarButtonItem *shareButton, *hideButton, *resetButton, *photoButton;
+@property (nonatomic, strong) UIBarButtonItem *shareButton, *hideButton, *automateButton, *pauseAutomateButton, *resetButton, *photoButton;
 
 @property (nonatomic, strong) UIToolbar *headerToolbar;
 @property (nonatomic, strong) UISlider *cornerRadiusSlider;
@@ -41,9 +44,10 @@
 @end
 
 @implementation ViewController {
-    BOOL _canBecomeFirstResponder;
     UIStatusBarStyle _preferredStatusBarStyle;
-    BOOL _hideStatusBar;
+    BOOL _showToolBars;
+    NSMutableArray *_recentTouchLocations;
+    BOOL _automating;
 }
 
 - (void)viewDidLoad {
@@ -63,30 +67,57 @@
     [self.view addSubview:self.backgroundImageView];
     [self.view addSubview:self.rootDotContainer];
     [self.view addSubview:self.headerToolbar];
-    _canBecomeFirstResponder = YES;
+    [self.view addSubview:self.footerToolbar];
     [self.view addGestureRecognizer:self.screenEdgePanGestureRecognizer];
     [self.view addGestureRecognizer:self.swipeUp];
     [self.view addGestureRecognizer:self.swipeDown];
+    [self.view addGestureRecognizer:self.tap];
     
     _preferredStatusBarStyle = UIStatusBarStyleDefault;
     [self updateBackgroundColorWithImage:[PDPDataManager sharedDataManager].image];
     
-    [self updateHeaderToolbar];
+    [self updateToolbars];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(animateUpdateViewConstraints)
+                                                 name:UIApplicationWillChangeStatusBarFrameNotification
+                                               object:nil];
+    
+//    NSTimer *submitTimer = [NSTimer scheduledTimerWithTimeInterval:2
+//                                                            target:self
+//                                                          selector:@selector(updateToolbars)
+//                                                          userInfo:nil
+//                                                           repeats:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    _canBecomeFirstResponder = _hideStatusBar;
-    [self updateHeaderToolbar];
-    [self setNeedsStatusBarAppearanceUpdate];
-    if (_canBecomeFirstResponder) {
-        [self becomeFirstResponder];
-    } else {
-        [self resignFirstResponder];
-    }
+    [self updateToolbars];
+    [self updateViewConstraints];
+    
+    [self animateUpdateViewConstraints];
 }
 
+- (void)animateUpdateViewConstraints {
+    [UIView animateWithDuration:0.35f
+                     animations:^{
+                         [self updateViewConstraints];
+                     }];
+}
+
+- (void)updateViewConstraints {
+    [super updateViewConstraints];
+    
+    if ([UIApplication sharedApplication].statusBarFrame.size.height > 20.0f) {
+        self.rootDotContainer.center = CGPointMake(self.view.frame.size.width * 0.5f,
+                                                   self.view.frame.size.height * 0.5f - [UIApplication sharedApplication].statusBarFrame.size.height + 20.0f);
+    } else {
+        self.rootDotContainer.center = self.view.center;
+    }
+    
+    [self setNeedsStatusBarAppearanceUpdate];
+}
 
 
 #pragma mark - Subviews
@@ -134,14 +165,14 @@
     return _rootDot;
 }
 
-- (UIToolbar *)inputAccessoryView {
-    if (!_inputAccessoryView) {
-        _inputAccessoryView = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, self.view.frame.size.height, self.view.frame.size.width, 44.0f)];
-        [_inputAccessoryView setItems:@[self.shareButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton]
+- (UIToolbar *)footerToolbar {
+    if (!_footerToolbar) {
+        _footerToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, self.view.frame.size.height, self.view.frame.size.width, toolbarHeight)];
+        [_footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.automateButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton]
                              animated:NO];
     }
     
-    return _inputAccessoryView;
+    return _footerToolbar;
 }
 
 - (UIBarButtonItem *)flexibleSpace {
@@ -170,6 +201,26 @@
     return _hideButton;
 }
 
+- (UIBarButtonItem *)automateButton {
+    if (!_automateButton) {
+        _automateButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
+                                                                        target:self
+                                                                        action:@selector(automateButtonTouched:)];
+    }
+    
+    return _automateButton;
+}
+
+- (UIBarButtonItem *)pauseAutomateButton {
+    if (!_pauseAutomateButton) {
+        _pauseAutomateButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause
+                                                                             target:self
+                                                                             action:@selector(automateButtonTouched:)];
+    }
+    
+    return _pauseAutomateButton;
+}
+
 - (UIBarButtonItem *)resetButton {
     if (!_resetButton) {
         _resetButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Reset", nil)
@@ -195,7 +246,7 @@
 
 - (UIToolbar *)headerToolbar {
     if (!_headerToolbar) {
-        _headerToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.frame.size.width, 44.0f)];
+        _headerToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.frame.size.width, toolbarHeight)];
         [_headerToolbar addSubview:self.cornerRadiusSlider];
     }
     
@@ -204,7 +255,7 @@
 
 - (UISlider *)cornerRadiusSlider {
     if (!_cornerRadiusSlider) {
-        _cornerRadiusSlider = [[UISlider alloc] initWithFrame:CGRectInset(_headerToolbar.bounds, 44.0f, 10.0f)];
+        _cornerRadiusSlider = [[UISlider alloc] initWithFrame:CGRectInset(_headerToolbar.bounds, toolbarHeight, 10.0f)];
         _cornerRadiusSlider.minimumValue = 0.001f;
         _cornerRadiusSlider.maximumValue = 1.0f;
         _cornerRadiusSlider.value = [[PDPDataManager sharedDataManager] cornerRadius];
@@ -241,11 +292,12 @@
 #pragma mark - Button Actions
 
 - (void)hideButtonTouched:(UIBarButtonItem *)hideButton {
-    _canBecomeFirstResponder = NO;
     [self resignFirstResponder];
 }
 
 - (void)photoButtonTouched:(UIBarButtonItem *)photoButton {
+    _automating = NO;
+    [self updateFooterToolbarItems];
     [self presentViewController:self.imagePicker
                        animated:YES
                      completion:^{
@@ -254,6 +306,8 @@
 }
 
 - (void)resetButtonTouched:(UIBarButtonItem *)resetButton {
+    _automating = NO;
+    [self updateFooterToolbarItems];
     NSMutableArray *subviews = [[self.view subviews] mutableCopy];
     [subviews addObjectsFromArray:self.rootDotContainer.subviews];
     
@@ -265,6 +319,8 @@
     
     [self.rootDot removeSubdivisions];
     self.rootDot = nil;
+    [self.view addSubview:self.footerToolbar];
+    [self.view addSubview:self.headerToolbar];
     [self.view addSubview:self.rootDotContainer];
     [self.rootDotContainer addSubview:self.rootDot];
     [self.rootDotContainer addSubview:self.interceptView];
@@ -273,6 +329,8 @@
 }
 
 - (void)shareButtonTouched:(UIBarButtonItem *)shareButton {
+    _automating = NO;
+    [self updateFooterToolbarItems];
     self.rootDotContainer.backgroundColor = self.backgroundColor;
     UIImage *exportImage = [self imageFromView:self.rootDotContainer];
     self.rootDotContainer.backgroundColor = [UIColor clearColor];
@@ -295,14 +353,29 @@
     }
 }
 
-
-
-
-#pragma mark - First Responder
-
-- (BOOL)canBecomeFirstResponder {
-    return _canBecomeFirstResponder;
+- (void)automateButtonTouched:(UIBarButtonItem *)automateButton {
+    if (!_automating) {
+        [self beginAutomation];
+    } else {
+        _automating = !_automating;
+        [automateButton setImage:(_automating ? [PDPDataManager sharedDataManager].image : [PDPDataManager sharedDataManager].image)];
+    }
+    
+    [self updateFooterToolbarItems];
 }
+
+- (void)updateFooterToolbarItems {
+    if (!_automating) {
+        [self.footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.automateButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton]
+                            animated:YES];
+    } else {
+        [self.footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.pauseAutomateButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton]
+                            animated:YES];
+        self.pauseAutomateButton.tintColor = self.automateButton.tintColor;
+    }
+}
+
+
 
 
 
@@ -338,6 +411,16 @@
     return _swipeUp;
 }
 
+- (UITapGestureRecognizer *)tap {
+    if (!_tap) {
+        _tap = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                       action:@selector(tapped:)];
+        _tap.numberOfTapsRequired = 2;
+    }
+    
+    return _tap;
+}
+
 
 
 #pragma mark - Gesture Recognizer Actions
@@ -347,31 +430,56 @@
 }
 
 - (void)swiped:(UISwipeGestureRecognizer *)swipe {
-    CGFloat possibleTouchHeight = (self.view.frame.size.height - self.view.frame.size.width) * 0.5f;
-    if ([swipe locationInView:self.view].y > self.view.frame.size.height - possibleTouchHeight || [swipe locationInView:self.view].y < possibleTouchHeight) {
-        if (swipe.direction == UISwipeGestureRecognizerDirectionDown) {
-            _canBecomeFirstResponder = NO;
-            _hideStatusBar = NO;
-            [self resignFirstResponder];
-        } else if (swipe.direction == UISwipeGestureRecognizerDirectionUp) {
-            _canBecomeFirstResponder = YES;
-            _hideStatusBar = YES;
-            [self becomeFirstResponder];
+    if ([swipe isEqual:self.swipeUp] || [swipe isEqual:self.swipeDown]) {
+        CGPoint p = [swipe locationInView:self.view];
+        
+        [self checkForUpdateFromTouchPoint:p];
+    }
+}
+
+- (void)tapped:(UITapGestureRecognizer *)tap {
+    if ([tap isEqual:self.tap]) {
+        CGPoint p = [tap locationInView:self.view];
+        
+        [self checkForUpdateFromTouchPoint:p];
+    }
+}
+
+- (void)checkForUpdateFromTouchPoint:(CGPoint)p {
+    CGFloat possibleTouchHeight = [self possibleTouchHeight];
+    if (p.y > self.view.frame.size.height - possibleTouchHeight || p.y < possibleTouchHeight) {
+        
+        _showToolBars = !_showToolBars;
+        
+        if (_showToolBars) {
+            NSLog(@"Show toolbars!");
         }
         
         [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
                          animations:^{
-                             [self setNeedsStatusBarAppearanceUpdate];
-                             [self updateHeaderToolbar];
+                             [self updateViewConstraints];
+                             [self updateToolbars];
                          }];
     }
 }
 
-- (void)updateHeaderToolbar {
-    if (_hideStatusBar) {
+- (CGFloat)possibleTouchHeight {
+    CGFloat possibleTouchHeight = (self.view.frame.size.height - self.view.frame.size.width) * 0.5f;
+
+    if (possibleTouchHeight < toolbarHeight * 2.0f) {
+        possibleTouchHeight = toolbarHeight * 2.0f;
+    }
+    
+    return possibleTouchHeight;
+}
+
+- (void)updateToolbars {
+    if (_showToolBars) {
         self.headerToolbar.center = CGPointMake(self.headerToolbar.center.x, fabs(self.headerToolbar.center.y));
+        self.footerToolbar.center = CGPointMake(self.view.frame.size.width * 0.5f, self.view.frame.size.height - self.footerToolbar.frame.size.height * 0.5f);
     } else {
         self.headerToolbar.center = CGPointMake(self.headerToolbar.center.x, -fabs(self.headerToolbar.center.y));
+        self.footerToolbar.center = CGPointMake(self.view.frame.size.width * 0.5f, self.view.frame.size.height + self.footerToolbar.frame.size.height * 0.5f);
     }
 }
 
@@ -412,8 +520,8 @@
                             blue:&blue
                            alpha:&alpha];
     
-    self.inputAccessoryView.barTintColor = self.backgroundColor;
-    self.headerToolbar.barTintColor = self.inputAccessoryView.barTintColor;
+    self.footerToolbar.barTintColor = self.backgroundColor;
+    self.headerToolbar.barTintColor = self.footerToolbar.barTintColor;
     self.view.backgroundColor = self.backgroundColor;
     
     CGFloat hue, saturation, brightness;
@@ -434,7 +542,7 @@
                                       brightness:brightness
                                            alpha:alpha];
     
-    [self setNeedsStatusBarAppearanceUpdate];
+    [self updateViewConstraints];
     
     self.accentColor1 = [UIColor colorWithHue:1.0f - red
                                    saturation:1.0f - green
@@ -461,7 +569,7 @@
                                    brightness:brightness
                                         alpha:1.0f];
 
-    for (UIBarButtonItem *barButtonItem in self.inputAccessoryView.items) {
+    for (UIBarButtonItem *barButtonItem in self.footerToolbar.items) {
         barButtonItem.tintColor = self.accentColor1;
     }
 }
@@ -478,7 +586,7 @@
 }
 
 - (BOOL)prefersStatusBarHidden {
-    return _hideStatusBar;
+    return _showToolBars;
 }
 
 - (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {
@@ -486,33 +594,118 @@
 }
 
 
+#pragma mark - Automation
+
+- (void)beginAutomation {
+    if (_automating) {
+        return;
+    } else {
+        _automating = YES;
+    }
+    
+    if (!_recentTouchLocations) {
+        _recentTouchLocations = [NSMutableArray new];
+    } else {
+        [_recentTouchLocations removeAllObjects];
+    }
+    
+    NSTimeInterval duration = 12.0f;
+    
+    for (NSTimeInterval t = 0.0f; t < duration; t += 0.01f) {
+        [self performSelector:@selector(touchAtRandom)
+                   withObject:nil
+                   afterDelay:t];
+    }
+    
+    [self performSelector:@selector(finishTouches)
+               withObject:nil
+               afterDelay:duration];
+}
+
+- (void)touchAtRandom {
+    if (!_automating) {
+        return;
+    }
+    
+    if (_recentTouchLocations.count > 16) {
+        [_recentTouchLocations removeObjectAtIndex:0];
+    }
+    
+    CGPoint randomPoint = CGPointMake(arc4random_uniform(self.rootDotContainer.frame.size.width),
+                                      arc4random_uniform(self.rootDotContainer.frame.size.height));
+    NSValue *dotPosition = [NSValue valueWithCGPoint:randomPoint];
+    [_recentTouchLocations addObject:dotPosition];
+    [self checkForDotsAtPoint:randomPoint];
+}
+
+- (void)finishTouches {
+    NSTimeInterval t = 0.0f;
+    
+    BOOL didFindUndividedDot = NO;
+    
+    NSArray *allDots = [[[[PDPDataManager sharedDataManager] allDots] allObjects] sortedArrayUsingComparator:^NSComparisonResult(PDPDotView *obj1, PDPDotView *obj2) {
+        return obj1.divisionLevel > obj2.divisionLevel;
+    }];
+    
+    for (int i = 0; i < allDots.count && i < 16; i++) {
+        PDPDotView *dot = [allDots objectAtIndex:i];
+        
+        if (!dot.isDivided) {
+            dot.isDivided = YES;
+            [dot layoutSubviews];
+        }
+    }
+    
+    for (PDPDotView *dot in allDots) {
+        if (!dot.isDivided) {
+//            dot.isDivided = YES;
+            
+//            [dot performSelector:@selector(layoutSubviews)
+//                      withObject:nil
+//                      afterDelay:t];
+//            t += 0.01f;
+            
+            if (!didFindUndividedDot) {
+                didFindUndividedDot = YES;
+                break;
+            }
+        }
+    }
+    
+    if (didFindUndividedDot) {
+        [self performSelector:@selector(finishTouches)
+                   withObject:nil
+                   afterDelay:t];
+    } else {
+        _automating = NO;
+        [self updateFooterToolbarItems];
+    }
+}
+
 #pragma mark - Measuring Touches
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:touch.view];
     
-    NSArray *allDots = [[[PDPDataManager sharedDataManager] allDots] allObjects];
-    for (PDPDotView *dot in allDots) {
-        if (CGRectContainsPoint(dot.frame, touchLocation)) {
-            if ([dot respondsToSelector:@selector(isDivided)] && !dot.isDivided) {
-                dot.isDivided = YES;
-                [dot layoutSubviews];
-            }
-        }
-    }
+    [self checkForDotsAtPoint:touchLocation];
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:touch.view];
     
+    [self checkForDotsAtPoint:touchLocation];
+}
+
+- (void)checkForDotsAtPoint:(CGPoint)point {
     NSArray *allDots = [[[PDPDataManager sharedDataManager] allDots] allObjects];
     for (PDPDotView *dot in allDots) {
-        if (CGRectContainsPoint(dot.frame, touchLocation)) {
+        if (CGRectContainsPoint(dot.frame, point)) {
             if ([dot respondsToSelector:@selector(isDivided)] && !dot.isDivided) {
                 dot.isDivided = YES;
                 [dot layoutSubviews];
+                return;
             }
         }
     }
