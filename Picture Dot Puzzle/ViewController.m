@@ -11,6 +11,8 @@
 #import "PDPDataManager.h"
 #import "PDPTouchInterceptView.h"
 #import "UIImage+PixelInformation.h"
+#import "UIImage+ImageEffects.h"
+#import "NGAParallaxMotion.h"
 
 static CGFloat const toolbarHeight = 44.0f;
 
@@ -160,6 +162,8 @@ static CGFloat const toolbarHeight = 44.0f;
         _rootDot = [[PDPDotView alloc] initWithFrame:self.rootDotContainer.bounds];
         [[[PDPDataManager sharedDataManager] allDots] addObject:_rootDot];
         _rootDot.rootView = _rootDot;
+        _rootDot.parallaxIntensity = 10.0f;
+        _rootDot.parallaxDirectionConstraint = NGAParallaxDirectionConstraintVertical;
     }
     
     return _rootDot;
@@ -278,7 +282,7 @@ static CGFloat const toolbarHeight = 44.0f;
         _imagePicker = [[UIImagePickerController alloc] init];
         _imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
         _imagePicker.delegate = self;
-        _imagePicker.allowsEditing = NO;
+        _imagePicker.allowsEditing = YES;
         _imagePicker.navigationBarHidden = YES;
     }
     
@@ -495,9 +499,13 @@ static CGFloat const toolbarHeight = 44.0f;
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+    UIImage *image = [info objectForKey:UIImagePickerControllerEditedImage];
     
     [self updateBackgroundColorWithImage:image];
+    self.backgroundImageView.image = [image applyBlurWithRadius:2.0f
+                                                      tintColor:self.backgroundColor
+                                          saturationDeltaFactor:0.2f
+                                                      maskImage:image];
     
     [picker dismissViewControllerAnimated:YES
                                completion:^{
