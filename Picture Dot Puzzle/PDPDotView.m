@@ -89,6 +89,7 @@ static NSInteger const numberOfSubdivisions = 2;
             for (int column = 0; column < numberOfSubdivisions; column++) {
                 PDPDotView *dot = [[PDPDotView alloc] initWithFrame:self.frame];
                 dot.rootView = self.rootView;
+                dot.backgroundColor = self.backgroundColor;
                 
                 [UIView animateWithDuration:[[PDPDataManager sharedDataManager] animationDuration]
                                  animations:^{
