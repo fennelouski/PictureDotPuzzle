@@ -17,6 +17,7 @@
 @property (nonatomic) float cornerRadius;
 
 @property (nonatomic) NSTimeInterval animationDuration;
+@property (nonatomic) NSTimeInterval automationDuration;
 
 @property (nonatomic, strong) NSMutableSet *allDots;
 

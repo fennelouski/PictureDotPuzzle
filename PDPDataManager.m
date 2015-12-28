@@ -10,6 +10,7 @@
 #import "UIImage+BlurredFrame.h"
 
 static NSString * const animationDurationKey = @"Animation Duration K£y";
+static NSString * const automationDurationKey = @"Automation Duration K£y";
 
 @implementation PDPDataManager {
     NSInteger _maximumDivisionLevel;
@@ -37,6 +38,11 @@ static NSString * const animationDurationKey = @"Animation Duration K£y";
         self.animationDuration = [defaults floatForKey:animationDurationKey];
         if (self.animationDuration == 0.0f) {
             self.animationDuration = 0.35f;
+        }
+        
+        self.automationDuration = [defaults floatForKey:automationDurationKey];
+        if (self.automationDuration == 0.0f) {
+            self.automationDuration = 12.0f;
         }
         
         self.allDots = [NSMutableSet new];
