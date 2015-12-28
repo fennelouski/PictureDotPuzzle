@@ -107,6 +107,11 @@ static NSInteger const numberOfSubdivisions = 2;
         
         [[PDPDataManager sharedDataManager].allDots removeObject:self];
     }
+    
+    if (self.subdivisions.count > 0) {
+        PDPDotView *subDotView = [self.subdivisions objectAtIndex:(NSUInteger)arc4random_uniform((int)self.subdivisions.count)];
+        [self.rootView bringSubviewToFront:subDotView];
+    }
 }
 
 - (CGRect)frameForRow:(int)row column:(int)column {
@@ -154,7 +159,8 @@ static NSInteger const numberOfSubdivisions = 2;
 }
 
 - (void)panned:(UIPanGestureRecognizer *)pan {
-        self.isDivided = YES;
+    self.isDivided = YES;
+    
     [self layoutSubviews];
 }
 
