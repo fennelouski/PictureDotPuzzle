@@ -149,10 +149,21 @@
     averageBrightness /= colors.count;
     averageAlpha /= 2.0f * colors.count;
     
-    return [UIColor colorWithRed:red
-                           green:green
-                            blue:blue
-                           alpha:alpha];
+    if (averageBrightness > 0.5f) {
+        averageBrightness *= 0.25f;
+    } else {
+        averageBrightness = 1.0f - ((1.0f - averageBrightness) * 0.25f);
+    }
+    
+    return [UIColor colorWithHue:averageHue
+                      saturation:averageSaturation
+                      brightness:averageBrightness
+                           alpha:1.0f];
+    
+    return [UIColor colorWithRed:averageRed
+                           green:averageGreen
+                            blue:averageBlue
+                           alpha:averageAlpha];
 }
 
 @end
