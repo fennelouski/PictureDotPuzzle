@@ -45,7 +45,8 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
             self.automationDuration = 12.0f;
         }
         
-        self.allDots = [NSMutableSet new];
+        self.allDots = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory
+                                                   capacity:16384];
     }
     
     return self;
