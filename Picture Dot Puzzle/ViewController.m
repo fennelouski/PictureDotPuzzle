@@ -57,13 +57,13 @@ static CGFloat const toolbarHeight = 44.0f;
     // Do any additional setup after loading the view, typically from a nib.
     
     if (self.view.frame.size.width > 500.0f) {
-        [PDPDataManager sharedDataManager].maximumDivisionLevel = 8;
-    } else if (self.view.frame.size.width > 400.0f) {
         [PDPDataManager sharedDataManager].maximumDivisionLevel = 7;
-    } else if (self.view.frame.size.width > 300.0f) {
+    } else if (self.view.frame.size.width > 400.0f) {
         [PDPDataManager sharedDataManager].maximumDivisionLevel = 6;
-    } else {
+    } else if (self.view.frame.size.width > 300.0f) {
         [PDPDataManager sharedDataManager].maximumDivisionLevel = 5;
+    } else {
+        [PDPDataManager sharedDataManager].maximumDivisionLevel = 4;
     }
     
     [self.view addSubview:self.backgroundImageView];
@@ -152,6 +152,8 @@ static CGFloat const toolbarHeight = 44.0f;
         _rootDotContainer.center = self.view.center;
         [_rootDotContainer addSubview:self.rootDot];
         [_rootDotContainer addSubview:self.interceptView];
+        _rootDotContainer.parallaxIntensity = 10.0f;
+        _rootDotContainer.parallaxDirectionConstraint = NGAParallaxDirectionConstraintVertical;
     }
     
     return _rootDotContainer;
@@ -162,8 +164,6 @@ static CGFloat const toolbarHeight = 44.0f;
         _rootDot = [[PDPDotView alloc] initWithFrame:self.rootDotContainer.bounds];
         [[[PDPDataManager sharedDataManager] allDots] addObject:_rootDot];
         _rootDot.rootView = _rootDot;
-        _rootDot.parallaxIntensity = 10.0f;
-        _rootDot.parallaxDirectionConstraint = NGAParallaxDirectionConstraintVertical;
     }
     
     return _rootDot;
@@ -687,7 +687,27 @@ static CGFloat const toolbarHeight = 44.0f;
     } else {
         _automating = NO;
         [self updateFooterToolbarItems];
+        
+        [self performSelector:@selector(replaceDotsWithImage)
+                   withObject:nil
+                   afterDelay:0.25f];
     }
+}
+
+- (void)replaceDotsWithImage {
+    UIImage *completedImage = [self imageFromView:self.rootDotContainer];
+    
+    int i = 0;
+    for (PDPDotView *dot in [PDPDataManager sharedDataManager].allDots) {
+        [dot removeFromSuperview];
+        NSLog(@"dot: %d", i++);
+    }
+    
+    UIImageView *completedImageView = [[UIImageView alloc] initWithImage:completedImage];
+    completedImageView.frame = self.rootDotContainer.bounds;
+    [self.rootDotContainer addSubview:completedImageView];
+    
+    [self.rootDot removeSubdivisions];
 }
 
 #pragma mark - Measuring Touches
@@ -748,6 +768,7 @@ static CGFloat const toolbarHeight = 44.0f;
     if ([ [UIScreen mainScreen] respondsToSelector: @selector(scale)] == YES) {
         return [ [UIScreen mainScreen] scale];
     }
+    
     return 1;
 }
 
