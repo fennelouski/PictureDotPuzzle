@@ -50,6 +50,7 @@ static CGFloat const toolbarHeight = 44.0f;
     BOOL _showToolBars;
     NSMutableArray *_recentTouchLocations;
     BOOL _automating;
+    NSMutableDictionary *_sliderImages;
 }
 
 - (void)viewDidLoad {
@@ -261,14 +262,18 @@ static CGFloat const toolbarHeight = 44.0f;
     if (!_cornerRadiusSlider) {
         _cornerRadiusSlider = [[UISlider alloc] initWithFrame:CGRectInset(_headerToolbar.bounds, toolbarHeight, 10.0f)];
         _cornerRadiusSlider.minimumValue = 0.001f;
-        _cornerRadiusSlider.maximumValue = 1.0f;
+        _cornerRadiusSlider.maximumValue = 0.6f;
         _cornerRadiusSlider.value = [[PDPDataManager sharedDataManager] cornerRadius];
         _cornerRadiusSlider.minimumTrackTintColor = [UIColor grayColor];
         _cornerRadiusSlider.maximumTrackTintColor = [UIColor lightGrayColor];
         [_cornerRadiusSlider addTarget:self
                                 action:@selector(sliderTouched:)
                       forControlEvents:UIControlEventAllEvents];
-        
+        [self sliderTouched:_cornerRadiusSlider];
+        [_cornerRadiusSlider setMaximumTrackImage:[UIImage imageNamed:@"Maximum Track Image"]
+                                         forState:UIControlStateNormal];
+        [_cornerRadiusSlider setMinimumTrackImage:[UIImage imageNamed:@"Minimum Track Image"]
+                                         forState:UIControlStateNormal];
     }
     
     return _cornerRadiusSlider;
@@ -329,6 +334,7 @@ static CGFloat const toolbarHeight = 44.0f;
     [self.rootDotContainer addSubview:self.rootDot];
     [self.rootDotContainer addSubview:self.interceptView];
     self.rootDot.isDivided = NO;
+    [self.footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.automateButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton] animated:YES];
     [self.rootDot layoutSubviews];
 }
 
@@ -353,6 +359,37 @@ static CGFloat const toolbarHeight = 44.0f;
         [PDPDataManager sharedDataManager].cornerRadius = slider.value;
         if (slider.value > 0.45 && slider.value < 0.55f) {
             [PDPDataManager sharedDataManager].cornerRadius = 0.5f;
+        }
+        
+        if (!_sliderImages) {
+            _sliderImages = [NSMutableDictionary new];
+        }
+        
+        if (![_sliderImages objectForKey:@([PDPDataManager sharedDataManager].cornerRadius)]) {
+            UIView *sliderViewContainer = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, toolbarHeight, toolbarHeight)];
+            UIView *sliderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, toolbarHeight * 0.7f, toolbarHeight * 0.7f)];
+            sliderView.backgroundColor = [UIColor whiteColor];
+            sliderView.layer.cornerRadius = sliderView.frame.size.height * slider.value;
+            UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:sliderView.bounds];
+            sliderView.layer.masksToBounds = NO;
+            sliderView.layer.shadowColor = [UIColor blackColor].CGColor;
+            CGFloat widthShadowOffset = (([PDPDataManager sharedDataManager].cornerRadius - slider.minimumValue)/(slider.maximumValue - slider.minimumValue)) * 4.0f - 2.0f;
+            sliderView.center = CGPointMake(sliderViewContainer.frame.size.width * 0.5f - widthShadowOffset,
+                                            sliderViewContainer.frame.size.height * 0.5f);
+            sliderView.layer.shadowOffset = CGSizeMake(widthShadowOffset, 2.0f);
+            sliderView.layer.shadowOpacity = 0.5f;
+            sliderView.layer.shadowPath = shadowPath.CGPath;
+            [sliderViewContainer addSubview:sliderView];
+            UIImage *sliderImage = [self imageFromView:sliderViewContainer];
+            if (sliderImage) {
+                [_sliderImages setObject:sliderImage
+                                  forKey:@([PDPDataManager sharedDataManager].cornerRadius)];
+                [slider setThumbImage:sliderImage
+                             forState:UIControlStateNormal];
+            }
+        } else {
+            [slider setThumbImage:[_sliderImages objectForKey:@([PDPDataManager sharedDataManager].cornerRadius)]
+                         forState:UIControlStateNormal];
         }
     }
 }
@@ -691,6 +728,8 @@ static CGFloat const toolbarHeight = 44.0f;
         [self performSelector:@selector(replaceDotsWithImage)
                    withObject:nil
                    afterDelay:0.25f];
+        
+        [self.footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton] animated:YES];
     }
 }
 
@@ -716,14 +755,18 @@ static CGFloat const toolbarHeight = 44.0f;
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:touch.view];
     
-    [self checkForDotsAtPoint:touchLocation];
+    if (CGRectContainsPoint(self.rootDotContainer.frame, [touch locationInView:self.view])) {
+        [self checkForDotsAtPoint:touchLocation];
+    }
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:touch.view];
     
-    [self checkForDotsAtPoint:touchLocation];
+    if (CGRectContainsPoint(self.rootDotContainer.frame, [touch locationInView:self.view])) {
+        [self checkForDotsAtPoint:touchLocation];
+    }
 }
 
 - (void)checkForDotsAtPoint:(CGPoint)point {
@@ -744,7 +787,7 @@ static CGFloat const toolbarHeight = 44.0f;
 // this should be added as a category on UIView
 
 - (UIImage *)imageFromView:(UIView *) view {
-    CGFloat scale = [self screenScale];
+    CGFloat scale = [UIScreen mainScreen].scale;
     
     if (view.bounds.size.width + view.bounds.size.height > 1200) {
         scale *= 2;
@@ -762,14 +805,6 @@ static CGFloat const toolbarHeight = 44.0f;
     UIGraphicsEndImageContext();
     
     return viewImage;
-}
-
-- (float)screenScale {
-    if ([ [UIScreen mainScreen] respondsToSelector: @selector(scale)] == YES) {
-        return [ [UIScreen mainScreen] scale];
-    }
-    
-    return 1;
 }
 
 

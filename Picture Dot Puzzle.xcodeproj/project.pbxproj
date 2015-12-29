@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		27069D5D1C317A5C00C06BAF /* NGAParallaxMotion.m in Sources */ = {isa = PBXBuildFile; fileRef = 27069D5C1C317A5C00C06BAF /* NGAParallaxMotion.m */; };
+		27069D601C329C9D00C06BAF /* Maximum Track Image.png in Resources */ = {isa = PBXBuildFile; fileRef = 27069D5E1C329C9D00C06BAF /* Maximum Track Image.png */; };
+		27069D611C329C9D00C06BAF /* Minimum Track Image.png in Resources */ = {isa = PBXBuildFile; fileRef = 27069D5F1C329C9D00C06BAF /* Minimum Track Image.png */; };
 		270882251C222AA90076621F /* PDPDotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 270882241C222AA90076621F /* PDPDotView.m */; };
 		274C45941C22836100CD8E2F /* UIImage+BlurredFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 274C45911C22836100CD8E2F /* UIImage+BlurredFrame.m */; };
 		274C45951C22836100CD8E2F /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 274C45931C22836100CD8E2F /* UIImage+ImageEffects.m */; };
@@ -37,6 +39,8 @@
 /* Begin PBXFileReference section */
 		27069D5B1C317A5C00C06BAF /* NGAParallaxMotion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NGAParallaxMotion.h; sourceTree = "<group>"; };
 		27069D5C1C317A5C00C06BAF /* NGAParallaxMotion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NGAParallaxMotion.m; sourceTree = "<group>"; };
+		27069D5E1C329C9D00C06BAF /* Maximum Track Image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Maximum Track Image.png"; sourceTree = "<group>"; };
+		27069D5F1C329C9D00C06BAF /* Minimum Track Image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Minimum Track Image.png"; sourceTree = "<group>"; };
 		270882231C222AA90076621F /* PDPDotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PDPDotView.h; sourceTree = "<group>"; };
 		270882241C222AA90076621F /* PDPDotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PDPDotView.m; sourceTree = "<group>"; };
 		274C45901C22836100CD8E2F /* UIImage+BlurredFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+BlurredFrame.h"; sourceTree = "<group>"; };
@@ -133,6 +137,8 @@
 		27E1DD2A1C2203A800B13AA6 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				27069D5E1C329C9D00C06BAF /* Maximum Track Image.png */,
+				27069D5F1C329C9D00C06BAF /* Minimum Track Image.png */,
 				277F4D991C2240CE0015710E /* 13 Rose.jpg */,
 				27E1DD2B1C2203A800B13AA6 /* Info.plist */,
 				27E1DD2C1C2203A800B13AA6 /* main.m */,
@@ -238,6 +244,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				27E1DD361C2203A800B13AA6 /* Main.storyboard in Resources */,
+				27069D601C329C9D00C06BAF /* Maximum Track Image.png in Resources */,
+				27069D611C329C9D00C06BAF /* Minimum Track Image.png in Resources */,
 				27E1DD3B1C2203A800B13AA6 /* LaunchScreen.xib in Resources */,
 				27E1DD381C2203A800B13AA6 /* Images.xcassets in Resources */,
 				277F4D9A1C2240CE0015710E /* 13 Rose.jpg in Resources */,
