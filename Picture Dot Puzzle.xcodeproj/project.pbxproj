@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2702ED151C32BFC100B7D8F4 /* Images-2.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2702ED141C32BFC100B7D8F4 /* Images-2.xcassets */; };
 		27069D5D1C317A5C00C06BAF /* NGAParallaxMotion.m in Sources */ = {isa = PBXBuildFile; fileRef = 27069D5C1C317A5C00C06BAF /* NGAParallaxMotion.m */; };
 		27069D601C329C9D00C06BAF /* Maximum Track Image.png in Resources */ = {isa = PBXBuildFile; fileRef = 27069D5E1C329C9D00C06BAF /* Maximum Track Image.png */; };
 		27069D611C329C9D00C06BAF /* Minimum Track Image.png in Resources */ = {isa = PBXBuildFile; fileRef = 27069D5F1C329C9D00C06BAF /* Minimum Track Image.png */; };
@@ -38,7 +37,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2702ED141C32BFC100B7D8F4 /* Images-2.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Images-2.xcassets"; sourceTree = "<group>"; };
 		27069D5B1C317A5C00C06BAF /* NGAParallaxMotion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NGAParallaxMotion.h; sourceTree = "<group>"; };
 		27069D5C1C317A5C00C06BAF /* NGAParallaxMotion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NGAParallaxMotion.m; sourceTree = "<group>"; };
 		27069D5E1C329C9D00C06BAF /* Maximum Track Image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Maximum Track Image.png"; sourceTree = "<group>"; };
@@ -131,7 +129,6 @@
 				27E1DD341C2203A800B13AA6 /* Main.storyboard */,
 				27E1DD371C2203A800B13AA6 /* Images.xcassets */,
 				27E1DD391C2203A800B13AA6 /* LaunchScreen.xib */,
-				2702ED141C32BFC100B7D8F4 /* Images-2.xcassets */,
 				27E1DD2A1C2203A800B13AA6 /* Supporting Files */,
 			);
 			path = "Picture Dot Puzzle";
@@ -248,7 +245,6 @@
 			files = (
 				27E1DD361C2203A800B13AA6 /* Main.storyboard in Resources */,
 				27069D601C329C9D00C06BAF /* Maximum Track Image.png in Resources */,
-				2702ED151C32BFC100B7D8F4 /* Images-2.xcassets in Resources */,
 				27069D611C329C9D00C06BAF /* Minimum Track Image.png in Resources */,
 				27E1DD3B1C2203A800B13AA6 /* LaunchScreen.xib in Resources */,
 				27E1DD381C2203A800B13AA6 /* Images.xcassets in Resources */,
@@ -407,7 +403,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				INFOPLIST_FILE = "Picture Dot Puzzle/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -418,7 +413,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				INFOPLIST_FILE = "Picture Dot Puzzle/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
