@@ -598,21 +598,31 @@ static CGFloat const toolbarHeight = 44.0f;
                       brightness:&brightness
                            alpha:&alpha];
     if (brightness > 0.5f) {
-        brightness = 1.0f - (1.0f - brightness) * 0.5f;
-        saturation = 1.0f - saturation;
-        _preferredStatusBarStyle = UIStatusBarStyleDefault;
-    } else {
         brightness *= 0.5f;
         saturation = 1.0f - saturation * 0.5f;
+        _preferredStatusBarStyle = UIStatusBarStyleDefault;
+        for (UIBarButtonItem *barButtonItem in self.footerToolbar.items) {
+            barButtonItem.tintColor = [UIColor colorWithHue:hue
+                                                 saturation:saturation
+                                                 brightness:0.1f
+                                                      alpha:1.0f];
+        }
+    } else {
+        brightness = 1.0f - (1.0f - brightness) * 0.5f;
+        saturation = 1.0f - saturation;
         _preferredStatusBarStyle = UIStatusBarStyleLightContent;
+        for (UIBarButtonItem *barButtonItem in self.footerToolbar.items) {
+            barButtonItem.tintColor = [UIColor colorWithHue:hue
+                                                 saturation:0.1f
+                                                 brightness:1.0f
+                                                      alpha:1.0f];
+        }
     }
     
     self.backgroundColor = [UIColor colorWithHue:hue
                                       saturation:saturation
                                       brightness:brightness
                                            alpha:alpha];
-    
-    [self updateViewConstraints];
     
     self.accentColor1 = [UIColor colorWithHue:1.0f - red
                                    saturation:1.0f - green
@@ -638,10 +648,12 @@ static CGFloat const toolbarHeight = 44.0f;
                                    saturation:saturation * 0.5f
                                    brightness:brightness
                                         alpha:1.0f];
-
-    for (UIBarButtonItem *barButtonItem in self.footerToolbar.items) {
-        barButtonItem.tintColor = self.accentColor1;
-    }
+    
+    [self updateViewConstraints];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self setNeedsStatusBarAppearanceUpdate];
+    });
 }
 
 
