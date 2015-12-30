@@ -35,6 +35,8 @@
  *  The collection of all dots currently on screen.
  */
 @property (nonatomic, strong) NSHashTable *allDots;
+@property (nonatomic) BOOL canMutateAllDots;
+@property (nonatomic) NSHashTable *reserveDots;
 
 /**
  *
@@ -46,6 +48,7 @@
 
 @property (nonatomic) NSInteger dotNumber;
 - (NSInteger)totalNumberOfDotsPossible;
+- (float)progress;
 
 /**
  *  When this image is changed, dots are NOT reset. This allows the user to combine different dots from different images and create their own collage.

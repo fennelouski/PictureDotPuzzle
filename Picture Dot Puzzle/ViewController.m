@@ -153,7 +153,13 @@ static CGFloat const toolbarHeight = 44.0f;
 - (PDPDotView *)rootDot {
     if (!_rootDot) {
         _rootDot = [[PDPDotView alloc] initWithFrame:self.rootDotContainer.bounds];
-        [[[PDPDataManager sharedDataManager] allDots] addObject:_rootDot];
+        
+        if ([PDPDataManager sharedDataManager].canMutateAllDots) {
+            [[PDPDataManager sharedDataManager].allDots addObject:_rootDot];
+        } else {
+            [[PDPDataManager sharedDataManager].reserveDots addObject:_rootDot];
+            NSLog(@"Reserve count: %zd", [PDPDataManager sharedDataManager].reserveDots.count);
+        }
         _rootDot.rootView = _rootDot;
     }
     
@@ -396,14 +402,24 @@ static CGFloat const toolbarHeight = 44.0f;
 }
 
 - (void)updateFooterToolbarItems {
-    if (!_automating) {
-        [self.footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.automateButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton]
+    if ([PDPDataManager sharedDataManager].progress > 0.99f) {
+        [self.footerToolbar setItems:@[self.shareButton,
+                                       self.flexibleSpace,
+                                       self.resetButton,
+                                       self.flexibleSpace,
+                                       self.photoButton]
                             animated:YES];
     } else {
-        [self.footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.pauseAutomateButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton]
+        [self.footerToolbar setItems:@[self.shareButton,
+                                       self.flexibleSpace,
+                                       (_automating) ? self.pauseAutomateButton : self.automateButton,
+                                       self.flexibleSpace,
+                                       self.resetButton,
+                                       self.flexibleSpace,
+                                       self.photoButton]
                             animated:YES];
-        self.pauseAutomateButton.tintColor = self.automateButton.tintColor;
     }
+    self.pauseAutomateButton.tintColor = self.automateButton.tintColor;
 }
 
 
@@ -650,7 +666,12 @@ static CGFloat const toolbarHeight = 44.0f;
         
         if (timeAddition > 0.05f) {
             timeAddition -= 0.05f;
+            
+            if ([PDPDataManager sharedDataManager].progress > 0.3f) {
+                timeAddition = 0.01f;
+            }
         }
+        
     }
     
     [self performSelector:@selector(finishTouches)
@@ -683,39 +704,49 @@ static CGFloat const toolbarHeight = 44.0f;
     
     BOOL didFindUndividedDot = NO;
     
-    NSArray *allDots = [[[[PDPDataManager sharedDataManager] allDots] allObjects] sortedArrayUsingComparator:^NSComparisonResult(PDPDotView *obj1, PDPDotView *obj2) {
+    [PDPDataManager sharedDataManager].canMutateAllDots = NO;
+    NSArray *copiedAllDots = [NSArray arrayWithArray:[PDPDataManager sharedDataManager].allDots.allObjects];
+    for (PDPDotView *dot in [PDPDataManager sharedDataManager].reserveDots) {
+        [[PDPDataManager sharedDataManager].allDots addObject:dot];
+    }
+    [[PDPDataManager sharedDataManager].reserveDots removeAllObjects];
+    [PDPDataManager sharedDataManager].canMutateAllDots = YES;
+    
+    NSArray *allDots = [copiedAllDots sortedArrayUsingComparator:^NSComparisonResult(PDPDotView *obj1, PDPDotView *obj2) {
         return obj1.divisionLevel > obj2.divisionLevel;
     }];
     
-    float groupSize = 16;
+    float groupSize = exp2f([PDPDataManager sharedDataManager].maximumDivisionLevel);
     
     for (float i = 0; i < allDots.count && i < groupSize; i++) {
         PDPDotView *dot = [allDots objectAtIndex:i];
         
         if (!dot.isDivided) {
             dot.isDivided = YES;
-            [dot layoutSubviews];
             
-            [dot performSelector:@selector(layoutSubviews)
+            [dot performSelector:@selector(layoutSubviewsOnMainThread)
                       withObject:nil
                       afterDelay:(t/groupSize) * i];
             didFindUndividedDot = YES;
         }
     }
     
-    if (didFindUndividedDot) {
-        [self performSelector:@selector(finishTouches)
-                   withObject:nil
-                   afterDelay:t];
+    if ([PDPDataManager sharedDataManager].dotNumber < [PDPDataManager sharedDataManager].totalNumberOfDotsPossible) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(t * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self touchAtRandom];
+            [self finishTouches];
+        });
     } else {
         _automating = NO;
-        [self updateFooterToolbarItems];
         
-        [self performSelector:@selector(replaceDotsWithImage)
-                   withObject:nil
-                   afterDelay:0.25f];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25F * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self replaceDotsWithImage];
+        });
         
-        [self.footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton] animated:YES];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateFooterToolbarItems];
+            [self.footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton] animated:YES];
+        });
     }
 }
 

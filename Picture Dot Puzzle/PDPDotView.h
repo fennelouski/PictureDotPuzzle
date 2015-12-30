@@ -18,6 +18,8 @@
 
 @property (nonatomic) NSInteger dotNumber;
 
+- (void)layoutSubviewsOnMainThread;
+
 - (void)removeSubdivisions;
 
 @end

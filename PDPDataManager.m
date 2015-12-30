@@ -48,27 +48,30 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
             self.automationDuration = 12.0f;
         }
         
-        self.allDots = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory
-                                                   capacity:16384];
-        
         _maximumDivisionLevel = [defaults integerForKey:maximumDivisionLevelKey];
         _totalNumberOfDotsPossible = [defaults integerForKey:totalNumberOfDotsPossibleKey];
-        if (_maximumDivisionLevel < 4 || _totalNumberOfDotsPossible > 100) {
+        if (_maximumDivisionLevel < 4 || _totalNumberOfDotsPossible < 100) {
             [self performSelector:@selector(calculateMaximumDivisionLevel)
                        withObject:nil
-                       afterDelay:0.35f];
+                       afterDelay:0.35f /*Long enough for the key window to load and have a frame size*/];
             _maximumDivisionLevel = 5;
         }
+        
+        self.allDots = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory
+                                                   capacity:_maximumDivisionLevel];
+        self.reserveDots = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory
+                                                       capacity:_maximumDivisionLevel];
+        self.canMutateAllDots = YES;
     }
     
     return self;
 }
 
 - (void)calculateMaximumDivisionLevel {
-    if ([UIApplication sharedApplication].keyWindow.frame.size.width > 500.0f) {
+    if ([UIApplication sharedApplication].keyWindow.frame.size.width > 1024.0f) {
         self.maximumDivisionLevel = 8;
         _totalNumberOfDotsPossible = 87380;
-    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 400.0f) {
+    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 460.0f) {
         self.maximumDivisionLevel = 7;
         _totalNumberOfDotsPossible = 21844;
     } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 300.0f) {
@@ -97,6 +100,10 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
 
 - (NSInteger)totalNumberOfDotsPossible {
     return _totalNumberOfDotsPossible;
+}
+
+- (float)progress {
+    return sqrtf((float)_dotNumber / (float)_totalNumberOfDotsPossible);
 }
 
 

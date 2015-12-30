@@ -38,6 +38,12 @@ static NSInteger const numberOfSubdivisions = 2;
     return self;
 }
 
+- (void)layoutSubviewsOnMainThread {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self layoutSubviews];
+    });
+}
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     
@@ -101,7 +107,12 @@ static NSInteger const numberOfSubdivisions = 2;
                 
                 dot.divisionLevel = self.divisionLevel + 1;
                 if (dot.divisionLevel < [PDPDataManager sharedDataManager].maximumDivisionLevel) {
-                    [[[PDPDataManager sharedDataManager] allDots] addObject:dot];
+                    if ([PDPDataManager sharedDataManager].canMutateAllDots) {
+                        [[PDPDataManager sharedDataManager].allDots addObject:dot];
+                    } else {
+                        [[PDPDataManager sharedDataManager].reserveDots addObject:dot];
+                        NSLog(@"Reserve count: %zd", [PDPDataManager sharedDataManager].reserveDots.count);
+                    }
                 }
                 [self.subdivisions addObject:dot];
                 [self.rootView addSubview:dot];
