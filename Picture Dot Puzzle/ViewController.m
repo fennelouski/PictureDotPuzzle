@@ -408,16 +408,33 @@ static CGFloat const toolbarHeight = 44.0f;
                                        self.resetButton,
                                        self.flexibleSpace,
                                        self.photoButton]
-                            animated:YES];
+                            animated:NO];
+        [self.resetButton setEnabled:YES];
+        [self.photoButton setEnabled:YES];
     } else {
-        [self.footerToolbar setItems:@[self.shareButton,
-                                       self.flexibleSpace,
-                                       (_automating) ? self.pauseAutomateButton : self.automateButton,
-                                       self.flexibleSpace,
-                                       self.resetButton,
-                                       self.flexibleSpace,
-                                       self.photoButton]
-                            animated:YES];
+        if (_automating) {
+            [self.footerToolbar setItems:@[self.shareButton,
+                                           self.flexibleSpace,
+                                           self.pauseAutomateButton,
+                                           self.flexibleSpace,
+                                           self.resetButton,
+                                           self.flexibleSpace,
+                                           self.photoButton]
+                                animated:YES];
+            [self.resetButton setEnabled:NO];
+            [self.photoButton setEnabled:NO];
+        } else {
+            [self.footerToolbar setItems:@[self.shareButton,
+                                           self.flexibleSpace,
+                                           self.automateButton,
+                                           self.flexibleSpace,
+                                           self.resetButton,
+                                           self.flexibleSpace,
+                                           self.photoButton]
+                                animated:YES];
+            [self.resetButton setEnabled:YES];
+            [self.photoButton setEnabled:YES];
+        }
     }
     self.pauseAutomateButton.tintColor = self.automateButton.tintColor;
 }
@@ -473,7 +490,11 @@ static CGFloat const toolbarHeight = 44.0f;
 #pragma mark - Gesture Recognizer Actions
 
 - (void)pannedFromEdge:(UIScreenEdgePanGestureRecognizer *)pan {
-    NSLog(@"Edge Panned!");
+    if (pan.state == UIGestureRecognizerStateBegan) {
+        CGPoint p = [pan locationInView:self.view];
+        
+        [self checkForUpdateFromTouchPoint:p];
+    }
 }
 
 - (void)swiped:(UISwipeGestureRecognizer *)swipe {
@@ -578,9 +599,11 @@ static CGFloat const toolbarHeight = 44.0f;
                            alpha:&alpha];
     if (brightness > 0.5f) {
         brightness = 1.0f - (1.0f - brightness) * 0.5f;
+        saturation = 1.0f - saturation;
         _preferredStatusBarStyle = UIStatusBarStyleDefault;
     } else {
         brightness *= 0.5f;
+        saturation = 1.0f - saturation * 0.5f;
         _preferredStatusBarStyle = UIStatusBarStyleLightContent;
     }
     
@@ -660,9 +683,9 @@ static CGFloat const toolbarHeight = 44.0f;
     
     
     for (NSTimeInterval t = [PDPDataManager sharedDataManager].animationDuration, timeAddition = [PDPDataManager sharedDataManager].animationDuration; t < duration; t += timeAddition) {
-        [self performSelector:@selector(touchAtRandom)
-                   withObject:nil
-                   afterDelay:t];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(t * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self touchAtRandom];
+        });
         
         if (timeAddition > 0.05f) {
             timeAddition -= 0.05f;
@@ -674,9 +697,9 @@ static CGFloat const toolbarHeight = 44.0f;
         
     }
     
-    [self performSelector:@selector(finishTouches)
-               withObject:nil
-               afterDelay:duration];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self finishTouches];
+    });
 }
 
 - (void)touchAtRandom {
@@ -724,9 +747,11 @@ static CGFloat const toolbarHeight = 44.0f;
         if (!dot.isDivided) {
             dot.isDivided = YES;
             
-            [dot performSelector:@selector(layoutSubviewsOnMainThread)
-                      withObject:nil
-                      afterDelay:(t/groupSize) * i];
+            NSTimeInterval delay = (t / groupSize * i * t * i) * 0.1f;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [dot layoutSubviewsOnMainThread];
+            });
+            
             didFindUndividedDot = YES;
         }
     }

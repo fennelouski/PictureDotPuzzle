@@ -45,15 +45,16 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
         
         self.automationDuration = [defaults floatForKey:automationDurationKey];
         if (self.automationDuration == 0.0f) {
-            self.automationDuration = 12.0f;
+            self.automationDuration = 6.0f;
         }
         
         _maximumDivisionLevel = [defaults integerForKey:maximumDivisionLevelKey];
         _totalNumberOfDotsPossible = [defaults integerForKey:totalNumberOfDotsPossibleKey];
         if (_maximumDivisionLevel < 4 || _totalNumberOfDotsPossible < 100) {
-            [self performSelector:@selector(calculateMaximumDivisionLevel)
-                       withObject:nil
-                       afterDelay:0.35f /*Long enough for the key window to load and have a frame size*/];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35f /*Long enough for the key window to load and have a frame size*/ * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self calculateMaximumDivisionLevel];
+            });
+            
             _maximumDivisionLevel = 5;
         }
         
