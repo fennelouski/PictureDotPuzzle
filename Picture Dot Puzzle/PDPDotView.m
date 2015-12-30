@@ -18,6 +18,8 @@
 @property (nonatomic, strong) UISwipeGestureRecognizer *swipe;
 @property (nonatomic, strong) UIPanGestureRecognizer *pan;
 
+@property (nonatomic) BOOL layoutColor;
+
 @end
 
 static NSInteger const numberOfSubdivisions = 2;
@@ -33,6 +35,8 @@ static NSInteger const numberOfSubdivisions = 2;
        forControlEvents:UIControlEventTouchDragEnter | UIControlEventTouchDragExit];
         
         self.dotNumber = [PDPDataManager sharedDataManager].dotNumber++;
+        
+        self.layoutColor = YES;
     }
     
     return self;
@@ -65,12 +69,20 @@ static NSInteger const numberOfSubdivisions = 2;
         [self addGestureRecognizer:self.tap];
         [self addGestureRecognizer:self.swipe];
         [self addGestureRecognizer:self.pan];
-        self.backgroundColor = [self colorAtCenter];
+        
+        if (self.layoutColor) {
+            self.backgroundColor = [self colorAtCenter];
+        }
     }
 }
 
 - (UIColor *)colorAtCenter {
     CGPoint center = self.center;
+    
+    return [self colorAtPoint:center];
+}
+
+- (UIColor *)colorAtPoint:(CGPoint)center {
     CGPoint relativeCenter = CGPointMake(center.x / self.rootView.frame.size.width,
                                          center.y / self.rootView.frame.size.height);
     UIImage *sourceImage = [[PDPDataManager sharedDataManager] image];
@@ -99,11 +111,35 @@ static NSInteger const numberOfSubdivisions = 2;
                 dot.rootView = self.rootView;
                 dot.backgroundColor = self.backgroundColor;
                 
-                [UIView animateWithDuration:[[PDPDataManager sharedDataManager] animationDuration]
-                                 animations:^{
-                                     dot.frame = [self frameForRow:row
-                                                            column:column];
-                                 }];
+                CGRect finalFrame = [self frameForRow:row
+                                               column:column];
+                
+                CGPoint finalFrameCenter = CGPointMake(finalFrame.origin.x + finalFrame.size.width * 0.5f,
+                                                       finalFrame.origin.y + finalFrame.size.height * 0.5f);
+                
+                if ([PDPDataManager sharedDataManager].cornerRadius == 0.5f) {
+                    CGPoint startingCenter = CGPointMake((finalFrameCenter.x + dot.center.x) * 0.5f,
+                                                         (finalFrameCenter.y + dot.center.y) * 0.5f);
+                    CGFloat scale = 0.55f;
+                    dot.frame = CGRectMake(0.0f,
+                                           0.0f,
+                                           self.frame.size.width * scale,
+                                           self.frame.size.height * scale);
+                    dot.center = startingCenter;
+                    
+                    [UIView animateWithDuration:[[PDPDataManager sharedDataManager] animationDuration]
+                                     animations:^{
+                                         dot.frame = finalFrame;
+                                         self.backgroundColor = [self colorAtPoint:finalFrameCenter];
+                                     }];
+                } else {
+                    [UIView animateWithDuration:[[PDPDataManager sharedDataManager] animationDuration]
+                                     animations:^{
+                                         dot.frame = [self frameForRow:row
+                                                                column:column];
+                                         self.backgroundColor = [self colorAtPoint:finalFrameCenter];
+                                     }];
+                }
                 
                 dot.divisionLevel = self.divisionLevel + 1;
                 if (dot.divisionLevel < [PDPDataManager sharedDataManager].maximumDivisionLevel) {
@@ -114,6 +150,7 @@ static NSInteger const numberOfSubdivisions = 2;
                         NSLog(@"Reserve count: %zd", [PDPDataManager sharedDataManager].reserveDots.count);
                     }
                 }
+                
                 [self.subdivisions addObject:dot];
                 [self.rootView addSubview:dot];
             }
@@ -126,13 +163,19 @@ static NSInteger const numberOfSubdivisions = 2;
         PDPDotView *subDotView = [self.subdivisions objectAtIndex:(NSUInteger)arc4random_uniform((int)self.subdivisions.count)];
         [self.rootView bringSubviewToFront:subDotView];
     }
+    
+    [self.rootView bringSubviewToFront:self];
 }
 
 - (CGRect)frameForRow:(int)row column:(int)column {
+    CGFloat oddSizeBuffer = 0.0f;
+    if (numberOfSubdivisions % 2 > 0) {
+        oddSizeBuffer = 0.5f;
+    }
     return CGRectMake(column * self.bounds.size.width / (float) numberOfSubdivisions + self.frame.origin.x,
                       row * self.bounds.size.height / (float) numberOfSubdivisions + self.frame.origin.y,
-                      self.bounds.size.width / (float) numberOfSubdivisions,
-                      self.bounds.size.height / (float) numberOfSubdivisions);
+                      self.bounds.size.width / (float) numberOfSubdivisions + oddSizeBuffer,
+                      self.bounds.size.height / (float) numberOfSubdivisions + oddSizeBuffer);
 }
 
 - (UITapGestureRecognizer *)tap {
