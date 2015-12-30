@@ -9,11 +9,14 @@
 #import "PDPDataManager.h"
 #import "UIImage+BlurredFrame.h"
 
+static NSString * const maximumDivisionLevelKey = @"Maximum Division Level K£y";
+static NSString * const totalNumberOfDotsPossibleKey = @"Total Number of Dots Possible K£y";
+
 static NSString * const animationDurationKey = @"Animation Duration K£y";
 static NSString * const automationDurationKey = @"Automation Duration K£y";
 
 @implementation PDPDataManager {
-    NSInteger _maximumDivisionLevel;
+    NSInteger _maximumDivisionLevel, _totalNumberOfDotsPossible;
     UIImage *_image;
 }
 
@@ -47,9 +50,40 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
         
         self.allDots = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory
                                                    capacity:16384];
+        
+        _maximumDivisionLevel = [defaults integerForKey:maximumDivisionLevelKey];
+        _totalNumberOfDotsPossible = [defaults integerForKey:totalNumberOfDotsPossibleKey];
+        if (_maximumDivisionLevel < 4 || _totalNumberOfDotsPossible > 100) {
+            [self performSelector:@selector(calculateMaximumDivisionLevel)
+                       withObject:nil
+                       afterDelay:0.35f];
+            _maximumDivisionLevel = 5;
+        }
     }
     
     return self;
+}
+
+- (void)calculateMaximumDivisionLevel {
+    if ([UIApplication sharedApplication].keyWindow.frame.size.width > 500.0f) {
+        self.maximumDivisionLevel = 8;
+        _totalNumberOfDotsPossible = 87380;
+    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 400.0f) {
+        self.maximumDivisionLevel = 7;
+        _totalNumberOfDotsPossible = 21844;
+    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 300.0f) {
+        self.maximumDivisionLevel = 6;
+        _totalNumberOfDotsPossible = 5460;
+    } else {
+        self.maximumDivisionLevel = 5;
+        _totalNumberOfDotsPossible = 1364;
+    }
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setInteger:self.maximumDivisionLevel
+                  forKey:maximumDivisionLevelKey];
+    [defaults setInteger:_totalNumberOfDotsPossible
+                  forKey:totalNumberOfDotsPossibleKey];
 }
 
 - (NSInteger)maximumDivisionLevel {
@@ -60,6 +94,12 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
 - (void)setMaximumDivisionLevel:(NSInteger)maximumDivisionLevel {
     _maximumDivisionLevel = maximumDivisionLevel;
 }
+
+- (NSInteger)totalNumberOfDotsPossible {
+    return _totalNumberOfDotsPossible;
+}
+
+
 
 - (UIImage *)image {
     return _image;

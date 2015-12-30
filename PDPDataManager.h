@@ -30,6 +30,7 @@
 @property (nonatomic) NSTimeInterval automationDuration;
 
 
+
 /**
  *  The collection of all dots currently on screen.
  */
@@ -42,6 +43,9 @@
  */
 - (NSInteger)maximumDivisionLevel;
 - (void)setMaximumDivisionLevel:(NSInteger)maximumDivisionLevel;
+
+@property (nonatomic) NSInteger dotNumber;
+- (NSInteger)totalNumberOfDotsPossible;
 
 /**
  *  When this image is changed, dots are NOT reset. This allows the user to combine different dots from different images and create their own collage.

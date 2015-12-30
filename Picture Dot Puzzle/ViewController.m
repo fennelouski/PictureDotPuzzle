@@ -57,16 +57,6 @@ static CGFloat const toolbarHeight = 44.0f;
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    if (self.view.frame.size.width > 500.0f) {
-        [PDPDataManager sharedDataManager].maximumDivisionLevel = 7;
-    } else if (self.view.frame.size.width > 400.0f) {
-        [PDPDataManager sharedDataManager].maximumDivisionLevel = 6;
-    } else if (self.view.frame.size.width > 300.0f) {
-        [PDPDataManager sharedDataManager].maximumDivisionLevel = 5;
-    } else {
-        [PDPDataManager sharedDataManager].maximumDivisionLevel = 4;
-    }
-    
     [self.view addSubview:self.backgroundImageView];
     [self.view addSubview:self.rootDotContainer];
     [self.view addSubview:self.headerToolbar];
@@ -325,6 +315,7 @@ static CGFloat const toolbarHeight = 44.0f;
     }
     
     [[[PDPDataManager sharedDataManager] allDots] removeAllObjects];
+    [PDPDataManager sharedDataManager].dotNumber = 0;
     
     [self.rootDot removeSubdivisions];
     self.rootDot = nil;
@@ -399,7 +390,6 @@ static CGFloat const toolbarHeight = 44.0f;
         [self beginAutomation];
     } else {
         _automating = !_automating;
-        [automateButton setImage:(_automating ? [PDPDataManager sharedDataManager].image : [PDPDataManager sharedDataManager].image)];
     }
     
     [self updateFooterToolbarItems];
@@ -491,10 +481,6 @@ static CGFloat const toolbarHeight = 44.0f;
     if (p.y > self.view.frame.size.height - possibleTouchHeight || p.y < possibleTouchHeight) {
         
         _showToolBars = !_showToolBars;
-        
-        if (_showToolBars) {
-            NSLog(@"Show toolbars!");
-        }
         
         [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
                          animations:^{

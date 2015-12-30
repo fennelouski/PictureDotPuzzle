@@ -31,6 +31,8 @@ static NSInteger const numberOfSubdivisions = 2;
         [self addTarget:self
                  action:@selector(dragged:)
        forControlEvents:UIControlEventTouchDragEnter | UIControlEventTouchDragExit];
+        
+        self.dotNumber = [PDPDataManager sharedDataManager].dotNumber++;
     }
     
     return self;

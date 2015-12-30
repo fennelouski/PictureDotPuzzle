@@ -16,6 +16,8 @@
 
 @property (nonatomic) NSInteger divisionLevel;
 
+@property (nonatomic) NSInteger dotNumber;
+
 - (void)removeSubdivisions;
 
 @end
