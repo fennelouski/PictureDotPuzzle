@@ -760,17 +760,19 @@ static CGFloat const toolbarHeight = 44.0f;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(t * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self touchAtRandom];
             [self finishTouches];
+            self.pauseAutomateButton.enabled = NO;
+            self.shareButton.enabled = NO;
+            self.cornerRadiusSlider.enabled = NO;
         });
     } else {
         _automating = NO;
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25F * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self replaceDotsWithImage];
-        });
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
             [self updateFooterToolbarItems];
-            [self.footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton] animated:YES];
+            self.pauseAutomateButton.enabled = YES;
+            self.shareButton.enabled = YES;
+            self.cornerRadiusSlider.enabled = YES;
         });
     }
 }
@@ -781,7 +783,6 @@ static CGFloat const toolbarHeight = 44.0f;
     int i = 0;
     for (PDPDotView *dot in [PDPDataManager sharedDataManager].allDots) {
         [dot removeFromSuperview];
-        NSLog(@"dot: %d", i++);
     }
     
     UIImageView *completedImageView = [[UIImageView alloc] initWithImage:completedImage];
