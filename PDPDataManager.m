@@ -58,6 +58,7 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
             _maximumDivisionLevel = 5;
         }
         
+        
         self.allDots = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory
                                                    capacity:_maximumDivisionLevel];
         self.reserveDots = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory

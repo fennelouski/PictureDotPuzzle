@@ -479,7 +479,7 @@ static CGFloat const toolbarHeight = 44.0f;
     if (!_tap) {
         _tap = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                        action:@selector(tapped:)];
-        _tap.numberOfTapsRequired = 2;
+        _tap.numberOfTapsRequired = 1;
     }
     
     return _tap;
@@ -574,10 +574,12 @@ static CGFloat const toolbarHeight = 44.0f;
 }
 
 - (void)updateBackgroundColorWithImage:(UIImage *)image {
+    if (image) {
+        [self resetButtonTouched:self.resetButton];
+    }
     [[PDPDataManager sharedDataManager] setImage:image];
-    
+    NSLog(@"Image size width: %g\t\theight: %g", image.size.width, image.size.height);
     [self.rootDot layoutSubviews];
-    
     
     self.backgroundColor = [[[PDPDataManager sharedDataManager] image] averageBorderColor];
     
@@ -597,6 +599,7 @@ static CGFloat const toolbarHeight = 44.0f;
                       saturation:&saturation
                       brightness:&brightness
                            alpha:&alpha];
+    
     if (brightness > 0.5f) {
         brightness *= 0.5f;
         saturation = 1.0f - saturation * 0.5f;
@@ -792,7 +795,6 @@ static CGFloat const toolbarHeight = 44.0f;
 - (void)replaceDotsWithImage {
     UIImage *completedImage = [self imageFromView:self.rootDotContainer];
     
-    int i = 0;
     for (PDPDotView *dot in [PDPDataManager sharedDataManager].allDots) {
         [dot removeFromSuperview];
     }
@@ -812,6 +814,14 @@ static CGFloat const toolbarHeight = 44.0f;
     
     if (CGRectContainsPoint(self.rootDotContainer.frame, [touch locationInView:self.view])) {
         [self checkForDotsAtPoint:touchLocation];
+        
+        if (_showToolBars) {
+            _showToolBars = NO;
+            [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
+                             animations:^{
+                                 [self updateToolbars];
+                             }];
+        }
     }
 }
 
