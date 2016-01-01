@@ -820,6 +820,7 @@ static CGFloat const toolbarHeight = 44.0f;
             [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
                              animations:^{
                                  [self updateToolbars];
+                                 [self setNeedsStatusBarAppearanceUpdate];
                              }];
         }
     }
