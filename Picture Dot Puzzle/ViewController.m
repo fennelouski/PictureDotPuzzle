@@ -762,7 +762,7 @@ static CGFloat const toolbarHeight = 44.0f;
         if (!dot.isDivided) {
             dot.isDivided = YES;
             
-            NSTimeInterval delay = (t / groupSize * i * t * i) * 0.1f;
+            NSTimeInterval delay = (t / groupSize * i * t * i) * 0.025f;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [dot layoutSubviewsOnMainThread];
             });
@@ -782,12 +782,17 @@ static CGFloat const toolbarHeight = 44.0f;
     } else {
         _automating = NO;
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25F * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self replaceDotsWithImage];
+        NSTimeInterval waitTime = 0.25f;
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(waitTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self updateFooterToolbarItems];
             self.pauseAutomateButton.enabled = YES;
             self.shareButton.enabled = YES;
             self.cornerRadiusSlider.enabled = YES;
+        });
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(waitTime * NSEC_PER_SEC)), dispatch_queue_create(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [self replaceDotsWithImage];
         });
     }
 }
@@ -795,15 +800,18 @@ static CGFloat const toolbarHeight = 44.0f;
 - (void)replaceDotsWithImage {
     UIImage *completedImage = [self imageFromView:self.rootDotContainer];
     
-    for (PDPDotView *dot in [PDPDataManager sharedDataManager].allDots) {
-        [dot removeFromSuperview];
-    }
-    
-    UIImageView *completedImageView = [[UIImageView alloc] initWithImage:completedImage];
-    completedImageView.frame = self.rootDotContainer.bounds;
-    [self.rootDotContainer addSubview:completedImageView];
-    
-    [self.rootDot removeSubdivisions];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (PDPDotView *dot in [PDPDataManager sharedDataManager].allDots) {
+            [dot removeFromSuperview];
+        }
+        
+        UIImageView *completedImageView = [[UIImageView alloc] initWithImage:completedImage];
+        completedImageView.frame = self.rootDotContainer.bounds;
+        
+        [self.rootDotContainer addSubview:completedImageView];
+        
+        [self.rootDot removeSubdivisions];
+    });
 }
 
 #pragma mark - Measuring Touches
