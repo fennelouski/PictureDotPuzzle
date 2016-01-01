@@ -13,6 +13,9 @@
 #import "UIImage+PixelInformation.h"
 #import "UIImage+ImageEffects.h"
 #import "NGAParallaxMotion.h"
+#import "NKFToolbar.h"
+
+#define degreesToRadians(x) (M_PI * (x) / 180.0)
 
 static CGFloat const toolbarHeight = 44.0f;
 
@@ -32,11 +35,11 @@ static CGFloat const toolbarHeight = 44.0f;
 @property (nonatomic, strong) UITapGestureRecognizer *tap;
 
 
-@property (nonatomic, strong) UIToolbar *footerToolbar;
+@property (nonatomic, strong) NKFToolbar *footerToolbar;
 @property (nonatomic, strong) UIBarButtonItem *flexibleSpace;
 @property (nonatomic, strong) UIBarButtonItem *shareButton, *hideButton, *automateButton, *pauseAutomateButton, *resetButton, *photoButton;
 
-@property (nonatomic, strong) UIToolbar *headerToolbar;
+@property (nonatomic, strong) NKFToolbar *headerToolbar;
 @property (nonatomic, strong) UISlider *cornerRadiusSlider;
 
 @property (nonatomic, strong) UIImagePickerController *imagePicker;
@@ -76,18 +79,18 @@ static CGFloat const toolbarHeight = 44.0f;
                                                  name:UIApplicationWillChangeStatusBarFrameNotification
                                                object:nil];
     
-//    NSTimer *submitTimer = [NSTimer scheduledTimerWithTimeInterval:2
-//                                                            target:self
-//                                                          selector:@selector(updateToolbars)
-//                                                          userInfo:nil
-//                                                           repeats:YES];
+    NSNotificationCenter *notificaitonCenter = [NSNotificationCenter defaultCenter];
+    [notificaitonCenter addObserver:self
+                           selector:@selector(updateViewConstraints)
+                               name:UIDeviceOrientationDidChangeNotification
+                             object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    [self updateToolbars];
     [self updateViewConstraints];
+    [self updateToolbars];
     
     [self animateUpdateViewConstraints];
 }
@@ -110,6 +113,8 @@ static CGFloat const toolbarHeight = 44.0f;
     }
     
     [self setNeedsStatusBarAppearanceUpdate];
+    
+    [self updateToolbars];
 }
 
 
@@ -166,11 +171,12 @@ static CGFloat const toolbarHeight = 44.0f;
     return _rootDot;
 }
 
-- (UIToolbar *)footerToolbar {
+- (NKFToolbar *)footerToolbar {
     if (!_footerToolbar) {
-        _footerToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, self.view.frame.size.height, self.view.frame.size.width, toolbarHeight)];
+        _footerToolbar = [[NKFToolbar alloc] initWithFrame:CGRectMake(0.0f, self.view.frame.size.height, self.view.frame.size.width, toolbarHeight)];
         [_footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.automateButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton]
                              animated:NO];
+        _footerToolbar.usesSpaces = YES;
     }
     
     return _footerToolbar;
@@ -245,9 +251,9 @@ static CGFloat const toolbarHeight = 44.0f;
 
 
 
-- (UIToolbar *)headerToolbar {
+- (NKFToolbar *)headerToolbar {
     if (!_headerToolbar) {
-        _headerToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.frame.size.width, toolbarHeight)];
+        _headerToolbar = [[NKFToolbar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.frame.size.width, toolbarHeight)];
         [_headerToolbar addSubview:self.cornerRadiusSlider];
     }
     
@@ -514,16 +520,32 @@ static CGFloat const toolbarHeight = 44.0f;
 }
 
 - (void)checkForUpdateFromTouchPoint:(CGPoint)p {
-    CGFloat possibleTouchHeight = [self possibleTouchHeight];
-    if (p.y > self.view.frame.size.height - possibleTouchHeight || p.y < possibleTouchHeight) {
+    if (self.footerToolbar.orientation == NKFToolbarOrientationHorizontal) {
+        CGFloat possibleTouchHeight = [self possibleTouchHeight];
         
-        _showToolBars = !_showToolBars;
+        if (p.y > self.view.frame.size.height - possibleTouchHeight || p.y < possibleTouchHeight) {
+            
+            _showToolBars = !_showToolBars;
+            
+            [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
+                             animations:^{
+                                 [self updateViewConstraints];
+                                 [self updateToolbars];
+                             }];
+        }
+    } else {
+        CGFloat possibleTouchWidth = [self possibleTouchWidth];
         
-        [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
-                         animations:^{
-                             [self updateViewConstraints];
-                             [self updateToolbars];
-                         }];
+        if (p.x > self.view.frame.size.width - possibleTouchWidth || p.x < possibleTouchWidth) {
+            
+            _showToolBars = !_showToolBars;
+            
+            [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
+                             animations:^{
+                                 [self updateViewConstraints];
+                                 [self updateToolbars];
+                             }];
+        }
     }
 }
 
@@ -537,14 +559,86 @@ static CGFloat const toolbarHeight = 44.0f;
     return possibleTouchHeight;
 }
 
-- (void)updateToolbars {
-    if (_showToolBars) {
-        self.headerToolbar.center = CGPointMake(self.headerToolbar.center.x, fabs(self.headerToolbar.center.y));
-        self.footerToolbar.center = CGPointMake(self.view.frame.size.width * 0.5f, self.view.frame.size.height - self.footerToolbar.frame.size.height * 0.5f);
-    } else {
-        self.headerToolbar.center = CGPointMake(self.headerToolbar.center.x, -fabs(self.headerToolbar.center.y));
-        self.footerToolbar.center = CGPointMake(self.view.frame.size.width * 0.5f, self.view.frame.size.height + self.footerToolbar.frame.size.height * 0.5f);
+- (CGFloat)possibleTouchWidth {
+    CGFloat possibleTouchWidth = (self.view.frame.size.width - self.view.frame.size.height) * 0.5f;
+    
+    if (possibleTouchWidth < self.footerToolbar.frame.size.width * 2.0f) {
+        possibleTouchWidth = self.footerToolbar.frame.size.width * 2.0f;
     }
+    
+    return possibleTouchWidth;
+}
+
+- (void)updateToolbars {
+    if ([UIDevice currentDevice].orientation == UIDeviceOrientationPortrait) {
+        CGAffineTransform rotateTransform = CGAffineTransformMakeRotation(degreesToRadians(0));
+        self.cornerRadiusSlider.transform = rotateTransform;
+        
+        self.footerToolbar.orientation = NKFToolbarOrientationHorizontal;
+        self.headerToolbar.orientation = NKFToolbarOrientationHorizontal;
+        
+        self.headerToolbar.frame = CGRectMake(0.0f,
+                                              0.0f,
+                                              self.view.frame.size.height,
+                                              toolbarHeight);
+
+        self.footerToolbar.frame = CGRectMake(0.0f,
+                                              self.view.frame.size.height - 44.0f,
+                                              self.view.frame.size.width,
+                                              44.0f);
+        
+        if (_showToolBars) {
+            [self.footerToolbar layoutSubviews];
+            [self.headerToolbar layoutSubviews];
+            
+            self.headerToolbar.center = CGPointMake(self.view.frame.size.width * 0.5f,
+                                                    self.headerToolbar.frame.size.height * 0.5f);
+            self.footerToolbar.center = CGPointMake(self.view.frame.size.width * 0.5f,
+                                                    self.view.frame.size.height - self.footerToolbar.frame.size.height * 0.5f);
+        } else {
+            self.headerToolbar.center = CGPointMake(self.view.frame.size.width * 0.5f,
+                                                    self.headerToolbar.frame.size.height * -0.5f);
+            self.footerToolbar.center = CGPointMake(self.view.frame.size.width * 0.5f,
+                                                    self.view.frame.size.height + self.footerToolbar.frame.size.height * 0.5f);
+        }
+    } else if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)) {
+        CGAffineTransform rotateTransform = CGAffineTransformMakeRotation(degreesToRadians(90));
+        self.cornerRadiusSlider.transform = rotateTransform;
+
+        self.footerToolbar.orientation = NKFToolbarOrientationVertical;
+        self.headerToolbar.orientation = NKFToolbarOrientationVertical;
+        
+        self.headerToolbar.frame = CGRectMake(0.0f,
+                                              0.0f,
+                                              toolbarHeight,
+                                              self.view.frame.size.height);
+
+        self.footerToolbar.frame = CGRectMake(0.0f,
+                                              0.0f,
+                                              60.0f,
+                                              self.view.frame.size.height);
+        
+        if (_showToolBars) {
+            self.headerToolbar.center = CGPointMake(self.view.frame.size.width - self.headerToolbar.frame.size.width * 0.5f,
+                                                    self.view.frame.size.height * 0.5f);
+            self.footerToolbar.center = CGPointMake(self.footerToolbar.frame.size.width * 0.5f,
+                                                    self.view.frame.size.height * 0.5f);
+            
+            [self.footerToolbar layoutSubviews];
+            [self.headerToolbar layoutSubviews];
+        } else {
+            self.headerToolbar.center = CGPointMake(self.view.frame.size.width + self.headerToolbar.frame.size.width * 0.5f,
+                                                    self.view.frame.size.height * 0.5f);
+            self.footerToolbar.center = CGPointMake(self.footerToolbar.frame.size.width * -0.5f,
+                                                    self.view.frame.size.height * 0.5f);
+        }
+    }
+    
+    self.cornerRadiusSlider.center = CGPointMake(self.headerToolbar.frame.size.width * 0.5f,
+                                                 self.headerToolbar.frame.size.height * 0.5f);
+    
+    [self.view addSubview:self.footerToolbar];
+    [self.view addSubview:self.headerToolbar];
 }
 
 
@@ -671,6 +765,10 @@ static CGFloat const toolbarHeight = 44.0f;
 }
 
 - (BOOL)prefersStatusBarHidden {
+    if (self.footerToolbar.orientation == NKFToolbarOrientationVertical) {
+        return YES;
+    }
+    
     return _showToolBars;
 }
 
