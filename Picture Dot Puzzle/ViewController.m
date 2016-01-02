@@ -31,7 +31,7 @@ static CGFloat const toolbarHeight = 44.0f;
 @property (nonatomic, strong) PDPDotView *rootDot;
 
 @property (nonatomic, strong) UIScreenEdgePanGestureRecognizer *screenEdgePanGestureRecognizer;
-@property (nonatomic, strong) UISwipeGestureRecognizer *swipeDown, *swipeUp;
+@property (nonatomic, strong) UISwipeGestureRecognizer *swipeDown, *swipeUp, *swipeLeft, *swipeRight;
 @property (nonatomic, strong) UITapGestureRecognizer *tap;
 
 
@@ -69,6 +69,8 @@ static CGFloat const toolbarHeight = 44.0f;
     [self.view addGestureRecognizer:self.screenEdgePanGestureRecognizer];
     [self.view addGestureRecognizer:self.swipeUp];
     [self.view addGestureRecognizer:self.swipeDown];
+    [self.view addGestureRecognizer:self.swipeLeft];
+    [self.view addGestureRecognizer:self.swipeRight];
     [self.view addGestureRecognizer:self.tap];
     
     _preferredStatusBarStyle = UIStatusBarStyleDefault;
@@ -77,7 +79,7 @@ static CGFloat const toolbarHeight = 44.0f;
     [self updateToolbars];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(animateUpdateViewConstraints)
+                                             selector:@selector(updateViewConstraints)
                                                  name:UIApplicationWillChangeStatusBarFrameNotification
                                                object:nil];
     
@@ -87,7 +89,7 @@ static CGFloat const toolbarHeight = 44.0f;
                                name:UIDeviceOrientationDidChangeNotification
                              object:nil];
     
-    [NSTimer scheduledTimerWithTimeInterval:0.25f
+    [NSTimer scheduledTimerWithTimeInterval:0.2f
                                      target:self
                                    selector:@selector(updateLoop)
                                    userInfo:nil
@@ -98,16 +100,6 @@ static CGFloat const toolbarHeight = 44.0f;
     [super viewDidAppear:animated];
     
     [self updateViewConstraints];
-    [self updateToolbars];
-    
-    [self animateUpdateViewConstraints];
-}
-
-- (void)animateUpdateViewConstraints {
-    [UIView animateWithDuration:0.35f
-                     animations:^{
-                         [self updateViewConstraints];
-                     }];
 }
 
 - (void)updateLoop {
@@ -119,11 +111,11 @@ static CGFloat const toolbarHeight = 44.0f;
 }
 
 - (void)updateViewConstraints {
+    [super updateViewConstraints];
+    
     if (_imagePickerPresented) {
         return;
     }
-    
-    [super updateViewConstraints];
     
     if ([UIApplication sharedApplication].statusBarFrame.size.height > 20.0f) {
         self.rootDotContainer.center = CGPointMake(self.view.frame.size.width * 0.5f,
@@ -501,6 +493,26 @@ static CGFloat const toolbarHeight = 44.0f;
     return _swipeUp;
 }
 
+- (UISwipeGestureRecognizer *)swipeLeft {
+    if (!_swipeLeft) {
+        _swipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self
+                                                               action:@selector(swiped:)];
+        _swipeLeft.direction = UISwipeGestureRecognizerDirectionLeft;
+    }
+    
+    return _swipeLeft;
+}
+
+- (UISwipeGestureRecognizer *)swipeRight {
+    if (!_swipeRight) {
+        _swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self
+                                                                action:@selector(swiped:)];
+        _swipeRight.direction = UISwipeGestureRecognizerDirectionRight;
+    }
+    
+    return _swipeRight;
+}
+
 - (UITapGestureRecognizer *)tap {
     if (!_tap) {
         _tap = [[UITapGestureRecognizer alloc] initWithTarget:self
@@ -524,7 +536,8 @@ static CGFloat const toolbarHeight = 44.0f;
 }
 
 - (void)swiped:(UISwipeGestureRecognizer *)swipe {
-    if ([swipe isEqual:self.swipeUp] || [swipe isEqual:self.swipeDown]) {
+    if ((([swipe isEqual:self.swipeUp] || [swipe isEqual:self.swipeDown]) && self.view.frame.size.height > self.view.frame.size.width)
+        || (([swipe isEqual:self.swipeLeft] || [swipe isEqual:self.swipeRight]) && self.view.frame.size.width > self.view.frame.size.height)){
         CGPoint p = [swipe locationInView:self.view];
         
         [self checkForUpdateFromTouchPoint:p];
@@ -665,6 +678,8 @@ static CGFloat const toolbarHeight = 44.0f;
     
     [self.view addSubview:self.footerToolbar];
     [self.view addSubview:self.headerToolbar];
+    self.footerToolbar.barTintColor = self.accentColor2;
+    self.headerToolbar.barTintColor = self.accentColor2;
 }
 
 
@@ -770,9 +785,9 @@ static CGFloat const toolbarHeight = 44.0f;
     
     saturation *= 0.2f;
     
-    self.accentColor1 = [UIColor colorWithHue:hue
+    self.accentColor2 = [UIColor colorWithHue:hue
                                    saturation:saturation * 0.5f
-                                   brightness:brightness
+                                   brightness:(brightness > 0.5f) ? 0.1f : 0.9f
                                         alpha:1.0f];
     
     [self updateViewConstraints];

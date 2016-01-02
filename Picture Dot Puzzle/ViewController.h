@@ -10,7 +10,7 @@
 
 @interface ViewController : UIViewController
 
-@property (nonatomic, strong) UIColor *backgroundColor, *accentColor1;
+@property (nonatomic, strong) UIColor *backgroundColor, *accentColor1, *accentColor2;
 
 @end
 
