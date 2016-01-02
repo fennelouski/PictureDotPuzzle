@@ -82,32 +82,34 @@
 }
 
 - (UIColor *)averageBorderColor {
-    NSMutableSet *colors = [NSMutableSet new];
+    NSMutableArray *colors = [NSMutableArray new];
     
-    float numberOfDivisions = 10.0f;
+    float numberOfDivisions = 50.0f;
+    
+    CGFloat edgeDistance = 0.01f;
     
     for (int edge = 0; edge < 4; edge++) {
         for (int i = 0; i < numberOfDivisions; i++) {
             CGPoint p = CGPointZero;
             switch (edge) {
                 case 0:
-                    p.x = 0;
+                    p.x = self.size.width * edgeDistance;
                     p.y = ((float)i / numberOfDivisions) * self.size.height;
                     break;
                     
                 case 1:
-                    p.x = self.size.width;
+                    p.x = self.size.width * (1.0f - edgeDistance);
                     p.y = ((float)i / numberOfDivisions) * self.size.height;
                     break;
                     
                 case 2:
                     p.x = ((float)i / numberOfDivisions) * self.size.width;
-                    p.y = 0;
+                    p.y = self.size.height * edgeDistance;
                     break;
                     
                 case 3:
                     p.x = ((float)i / numberOfDivisions) * self.size.width;
-                    p.y = self.size.height;
+                    p.y = self.size.height * (1.0f - edgeDistance);
                     break;
                     
                 default:
@@ -159,11 +161,6 @@
                       saturation:averageSaturation
                       brightness:averageBrightness
                            alpha:1.0f];
-    
-    return [UIColor colorWithRed:averageRed
-                           green:averageGreen
-                            blue:averageBlue
-                           alpha:averageAlpha];
 }
 
 @end
