@@ -49,11 +49,13 @@ static CGFloat const toolbarHeight = 44.0f;
 @end
 
 @implementation ViewController {
+    CGSize lastFrameSize;
     UIStatusBarStyle _preferredStatusBarStyle;
     BOOL _showToolBars;
     NSMutableArray *_recentTouchLocations;
     BOOL _automating;
     NSMutableDictionary *_sliderImages;
+    BOOL _imagePickerPresented;
 }
 
 - (void)viewDidLoad {
@@ -84,6 +86,12 @@ static CGFloat const toolbarHeight = 44.0f;
                            selector:@selector(updateViewConstraints)
                                name:UIDeviceOrientationDidChangeNotification
                              object:nil];
+    
+    [NSTimer scheduledTimerWithTimeInterval:0.25f
+                                     target:self
+                                   selector:@selector(updateLoop)
+                                   userInfo:nil
+                                    repeats:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -102,7 +110,19 @@ static CGFloat const toolbarHeight = 44.0f;
                      }];
 }
 
+- (void)updateLoop {
+    if ((lastFrameSize.width != self.view.bounds.size.width || lastFrameSize.height != self.view.bounds.size.height)
+        || (![self.headerToolbar.superview isEqual:self.view] || ![self.footerToolbar.superview isEqual:self.view])) {
+        [self updateViewConstraints];
+        lastFrameSize = self.view.bounds.size;
+    }
+}
+
 - (void)updateViewConstraints {
+    if (_imagePickerPresented) {
+        return;
+    }
+    
     [super updateViewConstraints];
     
     if ([UIApplication sharedApplication].statusBarFrame.size.height > 20.0f) {
@@ -111,8 +131,6 @@ static CGFloat const toolbarHeight = 44.0f;
     } else {
         self.rootDotContainer.center = self.view.center;
     }
-    
-    [self setNeedsStatusBarAppearanceUpdate];
     
     [self updateToolbars];
 }
@@ -143,13 +161,11 @@ static CGFloat const toolbarHeight = 44.0f;
     if (!_rootDotContainer) {
         _rootDotContainer = [[UIView alloc] initWithFrame:CGRectMake(0.0f,
                                                                      0.0f,
-                                                                     self.view.frame.size.width,
-                                                                     self.view.frame.size.width)];
+                                                                     self.view.frame.size.width < self.view.frame.size.height ? self.view.frame.size.width : self.view.frame.size.height,
+                                                                     self.view.frame.size.width < self.view.frame.size.height ? self.view.frame.size.width : self.view.frame.size.height)];
         _rootDotContainer.center = self.view.center;
         [_rootDotContainer addSubview:self.rootDot];
         [_rootDotContainer addSubview:self.interceptView];
-        _rootDotContainer.parallaxIntensity = 10.0f;
-        _rootDotContainer.parallaxDirectionConstraint = NGAParallaxDirectionConstraintVertical;
     }
     
     return _rootDotContainer;
@@ -253,7 +269,10 @@ static CGFloat const toolbarHeight = 44.0f;
 
 - (NKFToolbar *)headerToolbar {
     if (!_headerToolbar) {
-        _headerToolbar = [[NKFToolbar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.frame.size.width, toolbarHeight)];
+        _headerToolbar = [[NKFToolbar alloc] initWithFrame:CGRectMake(0.0f,
+                                                                      0.0f,
+                                                                      self.view.frame.size.width,
+                                                                      toolbarHeight)];
         [_headerToolbar addSubview:self.cornerRadiusSlider];
     }
     
@@ -309,6 +328,7 @@ static CGFloat const toolbarHeight = 44.0f;
 - (void)photoButtonTouched:(UIBarButtonItem *)photoButton {
     _automating = NO;
     [self updateFooterToolbarItems];
+    _imagePickerPresented = YES;
     [self presentViewController:self.imagePicker
                        animated:YES
                      completion:^{
@@ -414,7 +434,7 @@ static CGFloat const toolbarHeight = 44.0f;
                                        self.resetButton,
                                        self.flexibleSpace,
                                        self.photoButton]
-                            animated:NO];
+                            animated:YES];
         [self.resetButton setEnabled:YES];
         [self.photoButton setEnabled:YES];
     } else {
@@ -520,6 +540,8 @@ static CGFloat const toolbarHeight = 44.0f;
 }
 
 - (void)checkForUpdateFromTouchPoint:(CGPoint)p {
+    BOOL shouldUpdate = NO;
+    
     if (self.footerToolbar.orientation == NKFToolbarOrientationHorizontal) {
         CGFloat possibleTouchHeight = [self possibleTouchHeight];
         
@@ -527,11 +549,7 @@ static CGFloat const toolbarHeight = 44.0f;
             
             _showToolBars = !_showToolBars;
             
-            [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
-                             animations:^{
-                                 [self updateViewConstraints];
-                                 [self updateToolbars];
-                             }];
+            shouldUpdate = YES;
         }
     } else {
         CGFloat possibleTouchWidth = [self possibleTouchWidth];
@@ -540,12 +558,15 @@ static CGFloat const toolbarHeight = 44.0f;
             
             _showToolBars = !_showToolBars;
             
-            [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
-                             animations:^{
-                                 [self updateViewConstraints];
-                                 [self updateToolbars];
-                             }];
+            shouldUpdate = YES;
         }
+    }
+    
+    if (shouldUpdate) {
+        [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
+                         animations:^{
+                             [self updateViewConstraints];
+                         }];
     }
 }
 
@@ -570,16 +591,19 @@ static CGFloat const toolbarHeight = 44.0f;
 }
 
 - (void)updateToolbars {
-    if ([UIDevice currentDevice].orientation == UIDeviceOrientationPortrait) {
+    [self setNeedsStatusBarAppearanceUpdate];
+    
+    if (self.view.frame.size.height > self.view.frame.size.width) { // toolbars are horizontal
         CGAffineTransform rotateTransform = CGAffineTransformMakeRotation(degreesToRadians(0));
         self.cornerRadiusSlider.transform = rotateTransform;
+        self.cornerRadiusSlider.frame = CGRectInset(_headerToolbar.bounds, toolbarHeight, 10.0f);
         
         self.footerToolbar.orientation = NKFToolbarOrientationHorizontal;
         self.headerToolbar.orientation = NKFToolbarOrientationHorizontal;
         
         self.headerToolbar.frame = CGRectMake(0.0f,
                                               0.0f,
-                                              self.view.frame.size.height,
+                                              self.view.frame.size.width,
                                               toolbarHeight);
 
         self.footerToolbar.frame = CGRectMake(0.0f,
@@ -601,10 +625,10 @@ static CGFloat const toolbarHeight = 44.0f;
             self.footerToolbar.center = CGPointMake(self.view.frame.size.width * 0.5f,
                                                     self.view.frame.size.height + self.footerToolbar.frame.size.height * 0.5f);
         }
-    } else if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)) {
+    } else { // toolbars are vertical
         CGAffineTransform rotateTransform = CGAffineTransformMakeRotation(degreesToRadians(90));
         self.cornerRadiusSlider.transform = rotateTransform;
-
+        
         self.footerToolbar.orientation = NKFToolbarOrientationVertical;
         self.headerToolbar.orientation = NKFToolbarOrientationVertical;
         
@@ -632,6 +656,8 @@ static CGFloat const toolbarHeight = 44.0f;
             self.footerToolbar.center = CGPointMake(self.footerToolbar.frame.size.width * -0.5f,
                                                     self.view.frame.size.height * 0.5f);
         }
+        
+        self.cornerRadiusSlider.frame = CGRectInset(_headerToolbar.bounds, 10.0f, toolbarHeight);
     }
     
     self.cornerRadiusSlider.center = CGPointMake(self.headerToolbar.frame.size.width * 0.5f,
@@ -648,12 +674,15 @@ static CGFloat const toolbarHeight = 44.0f;
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [picker dismissViewControllerAnimated:YES
                                completion:^{
-                                   
+                                   _imagePickerPresented = NO;
                                }];
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     UIImage *image = [info objectForKey:UIImagePickerControllerEditedImage];
+    
+    UIImage *originalImage = [info objectForKey:UIImagePickerControllerOriginalImage];
+    NSLog(@"Original Image Size: %g, %g", originalImage.size.width, originalImage.size.height);
     
     [self updateBackgroundColorWithImage:image];
     self.backgroundImageView.image = [image applyBlurWithRadius:2.0f
@@ -663,7 +692,7 @@ static CGFloat const toolbarHeight = 44.0f;
     
     [picker dismissViewControllerAnimated:YES
                                completion:^{
-                                   
+                                   _imagePickerPresented = NO;
                                }];
 }
 
@@ -860,7 +889,7 @@ static CGFloat const toolbarHeight = 44.0f;
         if (!dot.isDivided) {
             dot.isDivided = YES;
             
-            NSTimeInterval delay = (t / groupSize * i * t * i) * 0.025f;
+            NSTimeInterval delay = (t / groupSize * i * t * i) * 0.2f;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [dot layoutSubviewsOnMainThread];
             });
@@ -926,7 +955,6 @@ static CGFloat const toolbarHeight = 44.0f;
             [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
                              animations:^{
                                  [self updateToolbars];
-                                 [self setNeedsStatusBarAppearanceUpdate];
                              }];
         }
     }
