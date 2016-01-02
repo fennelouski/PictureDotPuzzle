@@ -49,9 +49,9 @@
 }
 
 - (UIColor *)colorAtPixel:(CGPoint)point {
-    if (!CGRectContainsPoint(CGRectMake(0.0f, 0.0f, self.size.width, self.size.height), point)) {
-        return [UIColor clearColor];
-    }
+//    if (!CGRectContainsPoint(CGRectMake(0.0f, 0.0f, self.size.width, self.size.height), point)) {
+//        return [UIColor clearColor];
+//    }
     
     // Create a 1x1 pixel byte array and bitmap context to draw the pixel into.
     NSInteger pointX = trunc(point.x);
@@ -86,7 +86,7 @@
     
     float numberOfDivisions = 50.0f;
     
-    CGFloat edgeDistance = 0.01f;
+    CGFloat edgeDistance = 0.001f;
     
     for (int edge = 0; edge < 4; edge++) {
         for (int i = 0; i < numberOfDivisions; i++) {
