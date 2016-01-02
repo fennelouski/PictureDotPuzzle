@@ -58,4 +58,9 @@
 - (UIImage *)image;
 - (void)setImage:(UIImage *)image;
 
+
+
+
+- (NSString *)deviceType;
+
 @end
