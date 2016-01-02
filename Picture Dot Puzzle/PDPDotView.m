@@ -127,13 +127,13 @@ static NSInteger const numberOfSubdivisions = 2;
                                            self.frame.size.height * scale);
                     dot.center = startingCenter;
                     
-                    [UIView animateWithDuration:[[PDPDataManager sharedDataManager] animationDuration]
+                    [UIView animateWithDuration:(self.divisionLevel > 4) ? 0.0f : [[PDPDataManager sharedDataManager] animationDuration]
                                      animations:^{
                                          dot.frame = finalFrame;
                                          self.backgroundColor = [self colorAtPoint:finalFrameCenter];
                                      }];
                 } else {
-                    [UIView animateWithDuration:[[PDPDataManager sharedDataManager] animationDuration]
+                    [UIView animateWithDuration:(self.divisionLevel > 4) ? 0.0f : [[PDPDataManager sharedDataManager] animationDuration]
                                      animations:^{
                                          dot.frame = [self frameForRow:row
                                                                 column:column];
