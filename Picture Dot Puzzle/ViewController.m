@@ -1024,6 +1024,13 @@ static CGFloat const toolbarHeight = 44.0f;
 
 
 
+#pragma mark - Auto rotate
+
+- (BOOL)shouldAutorotate {
+    return !_automating;
+}
+
+
 #pragma mark - Memory Warning
 
 - (void)didReceiveMemoryWarning {
