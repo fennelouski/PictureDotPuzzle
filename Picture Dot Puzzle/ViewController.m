@@ -46,6 +46,8 @@ static CGFloat const toolbarHeight = 44.0f;
 
 @property (nonatomic, strong) UIImageView *backgroundImageView;
 
+@property (nonatomic, strong) UIImageView *originalImageView;
+
 @end
 
 @implementation ViewController {
@@ -108,6 +110,11 @@ static CGFloat const toolbarHeight = 44.0f;
         [self updateViewConstraints];
         lastFrameSize = self.view.bounds.size;
     }
+    
+    CGFloat progress = [PDPDataManager sharedDataManager].progress;
+    progress *= progress * progress * progress;
+    self.originalImageView.alpha = progress;
+    self.originalImageView.layer.cornerRadius = (1.0f - progress) * self.originalImageView.frame.size.width;
 }
 
 - (void)updateViewConstraints {
@@ -124,9 +131,10 @@ static CGFloat const toolbarHeight = 44.0f;
         self.rootDotContainer.center = self.view.center;
     }
     
+    self.originalImageView.frame = self.rootDotContainer.bounds;
+    
     [self updateToolbars];
 }
-
 
 #pragma mark - Subviews
 
@@ -185,6 +193,7 @@ static CGFloat const toolbarHeight = 44.0f;
         [_footerToolbar setItems:@[self.shareButton, self.flexibleSpace, self.automateButton, self.flexibleSpace, self.resetButton, self.flexibleSpace, self.photoButton]
                              animated:NO];
         _footerToolbar.usesSpaces = YES;
+        _footerToolbar.orientation = YES;
     }
     
     return _footerToolbar;
@@ -292,6 +301,18 @@ static CGFloat const toolbarHeight = 44.0f;
     return _cornerRadiusSlider;
 }
 
+- (UIImageView *)originalImageView {
+    if (!_originalImageView) {
+        _originalImageView = [[UIImageView alloc] initWithImage:[PDPDataManager sharedDataManager].image];
+        _originalImageView.contentMode = UIViewContentModeScaleAspectFill;
+        _originalImageView.frame = self.rootDotContainer.frame;
+        _originalImageView.clipsToBounds = YES;
+        _originalImageView.layer.cornerRadius = [PDPDataManager sharedDataManager].cornerRadius;
+    }
+    
+    return _originalImageView;
+}
+
 
 #pragma mark - View Controllers
 
@@ -346,6 +367,7 @@ static CGFloat const toolbarHeight = 44.0f;
     [self.view addSubview:self.footerToolbar];
     [self.view addSubview:self.headerToolbar];
     [self.view addSubview:self.rootDotContainer];
+    [self.rootDotContainer addSubview:self.originalImageView];
     [self.rootDotContainer addSubview:self.rootDot];
     [self.rootDotContainer addSubview:self.interceptView];
     self.rootDot.isDivided = NO;
@@ -356,7 +378,9 @@ static CGFloat const toolbarHeight = 44.0f;
 - (void)shareButtonTouched:(UIBarButtonItem *)shareButton {
     _automating = NO;
     [self updateFooterToolbarItems];
-    self.rootDotContainer.backgroundColor = self.backgroundColor;
+    self.rootDotContainer.backgroundColor = self.accentColor2;
+    [self.rootDotContainer addSubview:self.originalImageView];
+    [self.rootDotContainer sendSubviewToBack:self.originalImageView];
     UIImage *exportImage = [self imageFromView:self.rootDotContainer];
     self.rootDotContainer.backgroundColor = [UIColor clearColor];
     
@@ -704,6 +728,8 @@ static CGFloat const toolbarHeight = 44.0f;
                                                       tintColor:self.backgroundColor
                                           saturationDeltaFactor:0.2f
                                                       maskImage:image];
+    self.originalImageView.image = image;
+    
     
     [picker dismissViewControllerAnimated:YES
                                completion:^{
