@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "931166113E02157E97F235B33F3708981E00C3CD",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "931166113E02157E97F235B33F3708981E00C3CD" : 0,
+    "FBBE555AA08763FD0C26C267FC17B60CDC7DD025" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "73F00039-B3BE-4DE4-8EF5-FB273FEE8D4C",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "931166113E02157E97F235B33F3708981E00C3CD" : "Picture%20Dot%20Puzzle\/",
+    "FBBE555AA08763FD0C26C267FC17B60CDC7DD025" : "Toolbar%20Test\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Picture Dot Puzzle",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Picture Dot Puzzle.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/fennelouski\/PictureDotPuzzle.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "931166113E02157E97F235B33F3708981E00C3CD"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/fennelouski\/NKFToolbar.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "FBBE555AA08763FD0C26C267FC17B60CDC7DD025"
+    }
+  ]
+}
