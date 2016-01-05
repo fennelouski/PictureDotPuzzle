@@ -107,7 +107,19 @@ static CGFloat const toolbarHeight = 44.0f;
 - (void)updateLoop {
     if ((lastFrameSize.width != self.view.bounds.size.width || lastFrameSize.height != self.view.bounds.size.height)
         || (![self.headerToolbar.superview isEqual:self.view] || ![self.footerToolbar.superview isEqual:self.view])) {
+        
+        self.rootDotContainer.frame = CGRectMake(0.0f,
+                                                 0.0f,
+                                                 self.view.bounds.size.width < self.view.bounds.size.height ? self.view.bounds.size.width : self.view.bounds.size.height,
+                                                 self.view.bounds.size.width < self.view.bounds.size.height ? self.view.bounds.size.width : self.view.bounds.size.height);
+        self.rootDot.frame = self.rootDotContainer.bounds;
+        [self.rootDot layoutSubviews];
+        
         [self updateViewConstraints];
+        [self updateToolbars];
+        [self performSelector:@selector(updateToolbars)
+                   withObject:self
+                   afterDelay:2.35f];
         lastFrameSize = self.view.bounds.size;
     }
     
@@ -182,6 +194,8 @@ static CGFloat const toolbarHeight = 44.0f;
             NSLog(@"Reserve count: %zd", [PDPDataManager sharedDataManager].reserveDots.count);
         }
         _rootDot.rootView = _rootDot;
+        _rootDot.relativeCenter = CGPointMake(0.5f,
+                                              0.5f);
     }
     
     return _rootDot;
@@ -285,7 +299,7 @@ static CGFloat const toolbarHeight = 44.0f;
         _cornerRadiusSlider = [[UISlider alloc] initWithFrame:CGRectInset(_headerToolbar.bounds, toolbarHeight, 10.0f)];
         _cornerRadiusSlider.minimumValue = 0.001f;
         _cornerRadiusSlider.maximumValue = 0.6f;
-        _cornerRadiusSlider.value = [[PDPDataManager sharedDataManager] cornerRadius];
+        _cornerRadiusSlider.value = [PDPDataManager sharedDataManager].cornerRadius;
         _cornerRadiusSlider.minimumTrackTintColor = [UIColor grayColor];
         _cornerRadiusSlider.maximumTrackTintColor = [UIColor lightGrayColor];
         [_cornerRadiusSlider addTarget:self

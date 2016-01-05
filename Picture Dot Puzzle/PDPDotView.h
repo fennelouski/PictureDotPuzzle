@@ -18,6 +18,13 @@
 
 @property (nonatomic) NSInteger dotNumber;
 
+/**
+ *  The center of the dot as a value between 0 and 1 relative to the dot container.
+ */
+@property (nonatomic) CGPoint relativeCenter;
+
+@property (nonatomic) CGSize relativeSize;
+
 - (void)layoutSubviewsOnMainThread;
 
 - (void)removeSubdivisions;
