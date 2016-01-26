@@ -85,13 +85,12 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
     } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 400.0f) {
         self.maximumDivisionLevel = 6;
         _totalNumberOfDotsPossible = 5460;
-    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 200.0f) {
+    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 300.0f) {
         self.maximumDivisionLevel = 5;
         _totalNumberOfDotsPossible = 1364;
     } else {
         self.maximumDivisionLevel = 4;
         _totalNumberOfDotsPossible = 600;
-        NSLog(@"Low res %g", [UIApplication sharedApplication].keyWindow.frame.size.width);
     }
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
