@@ -381,7 +381,7 @@ static CGFloat const toolbarHeight = 44.0f;
     [self.view addSubview:self.footerToolbar];
     [self.view addSubview:self.headerToolbar];
     [self.view addSubview:self.rootDotContainer];
-    [self.rootDotContainer addSubview:self.originalImageView];
+//    [self.rootDotContainer addSubview:self.originalImageView];
     [self.rootDotContainer addSubview:self.rootDot];
     [self.rootDotContainer addSubview:self.interceptView];
     self.rootDot.isDivided = NO;
@@ -396,6 +396,7 @@ static CGFloat const toolbarHeight = 44.0f;
     [self.rootDotContainer addSubview:self.originalImageView];
     [self.rootDotContainer sendSubviewToBack:self.originalImageView];
     UIImage *exportImage = [self imageFromView:self.rootDotContainer];
+    [self.originalImageView removeFromSuperview];
     self.rootDotContainer.backgroundColor = [UIColor clearColor];
     
     NSArray *activityItems = @[exportImage];
@@ -725,6 +726,7 @@ static CGFloat const toolbarHeight = 44.0f;
 #pragma mark - Image Picker Delegate
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [self.originalImageView removeFromSuperview];
     [picker dismissViewControllerAnimated:YES
                                completion:^{
                                    _imagePickerPresented = NO;
