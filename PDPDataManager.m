@@ -37,9 +37,17 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
     self = [super init];
     if (self) {
         self.cornerRadius = 0.5f;
-        self.image = [UIImage imageNamed:@"13 Rose.jpg"];
         
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        
+        if ([defaults integerForKey:@"Number of loads"] < 2) {
+            self.image = [UIImage imageNamed:@"2.jpg"];
+            [defaults setInteger:[defaults integerForKey:@"Number of loads"] + 1
+                          forKey:@"Number of loads"];
+        } else {
+            self.image = [UIImage imageNamed:[NSString stringWithFormat:@"%d.jpg", arc4random_uniform(8) + 1]];
+        }
+        
         self.animationDuration = [defaults floatForKey:animationDurationKey];
         if (self.animationDuration == 0.0f) {
             self.animationDuration = 0.35f;
@@ -52,13 +60,10 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
         
         _maximumDivisionLevel = [defaults integerForKey:maximumDivisionLevelKey];
         _totalNumberOfDotsPossible = [defaults integerForKey:totalNumberOfDotsPossibleKey];
-        if (_maximumDivisionLevel < 4 || _totalNumberOfDotsPossible < 100) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35f /*Long enough for the key window to load and have a frame size*/ * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self calculateMaximumDivisionLevel];
-            });
-            
-            _maximumDivisionLevel = 5;
-        }
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self calculateMaximumDivisionLevel];
+        });
         
         self.allDots = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory
                                                    capacity:_maximumDivisionLevel];
@@ -71,18 +76,22 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
 }
 
 - (void)calculateMaximumDivisionLevel {
-    if ([UIApplication sharedApplication].keyWindow.frame.size.width > 2024.0f) {
+    if ([UIApplication sharedApplication].keyWindow.frame.size.width > 92024.0f) {
         self.maximumDivisionLevel = 8;
         _totalNumberOfDotsPossible = 87380;
-    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 1024.0f) {
+    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 91024.0f) {
         self.maximumDivisionLevel = 7;
         _totalNumberOfDotsPossible = 21844;
-    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 300.0f) {
+    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 400.0f) {
         self.maximumDivisionLevel = 6;
         _totalNumberOfDotsPossible = 5460;
-    } else {
+    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 200.0f) {
         self.maximumDivisionLevel = 5;
         _totalNumberOfDotsPossible = 1364;
+    } else {
+        self.maximumDivisionLevel = 4;
+        _totalNumberOfDotsPossible = 600;
+        NSLog(@"Low res %g", [UIApplication sharedApplication].keyWindow.frame.size.width);
     }
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];

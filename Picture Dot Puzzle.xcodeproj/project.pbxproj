@@ -15,9 +15,16 @@
 		274C45941C22836100CD8E2F /* UIImage+BlurredFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 274C45911C22836100CD8E2F /* UIImage+BlurredFrame.m */; };
 		274C45951C22836100CD8E2F /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 274C45931C22836100CD8E2F /* UIImage+ImageEffects.m */; };
 		277F4D981C223F2E0015710E /* PDPDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 277F4D971C223F2E0015710E /* PDPDataManager.m */; };
-		277F4D9A1C2240CE0015710E /* 13 Rose.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 277F4D991C2240CE0015710E /* 13 Rose.jpg */; };
 		277F4D9D1C225F360015710E /* UIImage+PixelInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 277F4D9C1C225F360015710E /* UIImage+PixelInformation.m */; };
 		277F4DA01C2265C10015710E /* PDPTouchInterceptView.m in Sources */ = {isa = PBXBuildFile; fileRef = 277F4D9F1C2265C10015710E /* PDPTouchInterceptView.m */; };
+		27807F1D1C56AD3D0017791C /* 1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27807F151C56AD3D0017791C /* 1.jpg */; };
+		27807F1E1C56AD3D0017791C /* 2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27807F161C56AD3D0017791C /* 2.jpg */; };
+		27807F1F1C56AD3D0017791C /* 3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27807F171C56AD3D0017791C /* 3.jpg */; };
+		27807F201C56AD3D0017791C /* 4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27807F181C56AD3D0017791C /* 4.jpg */; };
+		27807F211C56AD3D0017791C /* 5.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27807F191C56AD3D0017791C /* 5.jpg */; };
+		27807F221C56AD3D0017791C /* 6.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27807F1A1C56AD3D0017791C /* 6.jpg */; };
+		27807F231C56AD3D0017791C /* 7.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27807F1B1C56AD3D0017791C /* 7.jpg */; };
+		27807F241C56AD3D0017791C /* 8.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27807F1C1C56AD3D0017791C /* 8.jpg */; };
 		27E1DD2D1C2203A800B13AA6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD2C1C2203A800B13AA6 /* main.m */; };
 		27E1DD301C2203A800B13AA6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD2F1C2203A800B13AA6 /* AppDelegate.m */; };
 		27E1DD331C2203A800B13AA6 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD321C2203A800B13AA6 /* ViewController.m */; };
@@ -52,11 +59,18 @@
 		274C45931C22836100CD8E2F /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageEffects.m"; sourceTree = "<group>"; };
 		277F4D961C223F2E0015710E /* PDPDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PDPDataManager.h; path = "Picture Dot Puzzle.xcodeproj/../PDPDataManager.h"; sourceTree = SOURCE_ROOT; };
 		277F4D971C223F2E0015710E /* PDPDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PDPDataManager.m; path = "Picture Dot Puzzle.xcodeproj/../PDPDataManager.m"; sourceTree = SOURCE_ROOT; };
-		277F4D991C2240CE0015710E /* 13 Rose.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "13 Rose.jpg"; sourceTree = "<group>"; };
 		277F4D9B1C225F360015710E /* UIImage+PixelInformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+PixelInformation.h"; sourceTree = "<group>"; };
 		277F4D9C1C225F360015710E /* UIImage+PixelInformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+PixelInformation.m"; sourceTree = "<group>"; };
 		277F4D9E1C2265C10015710E /* PDPTouchInterceptView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PDPTouchInterceptView.h; path = "Picture Dot Puzzle.xcodeproj/../PDPTouchInterceptView.h"; sourceTree = SOURCE_ROOT; };
 		277F4D9F1C2265C10015710E /* PDPTouchInterceptView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PDPTouchInterceptView.m; path = "Picture Dot Puzzle.xcodeproj/../PDPTouchInterceptView.m"; sourceTree = SOURCE_ROOT; };
+		27807F151C56AD3D0017791C /* 1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 1.jpg; sourceTree = "<group>"; };
+		27807F161C56AD3D0017791C /* 2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 2.jpg; sourceTree = "<group>"; };
+		27807F171C56AD3D0017791C /* 3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 3.jpg; sourceTree = "<group>"; };
+		27807F181C56AD3D0017791C /* 4.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 4.jpg; sourceTree = "<group>"; };
+		27807F191C56AD3D0017791C /* 5.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 5.jpg; sourceTree = "<group>"; };
+		27807F1A1C56AD3D0017791C /* 6.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 6.jpg; sourceTree = "<group>"; };
+		27807F1B1C56AD3D0017791C /* 7.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 7.jpg; sourceTree = "<group>"; };
+		27807F1C1C56AD3D0017791C /* 8.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 8.jpg; sourceTree = "<group>"; };
 		27E1DD271C2203A800B13AA6 /* Picture Dot Puzzle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Picture Dot Puzzle.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E1DD2B1C2203A800B13AA6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		27E1DD2C1C2203A800B13AA6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -144,7 +158,14 @@
 			children = (
 				27069D5E1C329C9D00C06BAF /* Maximum Track Image.png */,
 				27069D5F1C329C9D00C06BAF /* Minimum Track Image.png */,
-				277F4D991C2240CE0015710E /* 13 Rose.jpg */,
+				27807F151C56AD3D0017791C /* 1.jpg */,
+				27807F161C56AD3D0017791C /* 2.jpg */,
+				27807F171C56AD3D0017791C /* 3.jpg */,
+				27807F181C56AD3D0017791C /* 4.jpg */,
+				27807F191C56AD3D0017791C /* 5.jpg */,
+				27807F1A1C56AD3D0017791C /* 6.jpg */,
+				27807F1B1C56AD3D0017791C /* 7.jpg */,
+				27807F1C1C56AD3D0017791C /* 8.jpg */,
 				27E1DD2B1C2203A800B13AA6 /* Info.plist */,
 				27E1DD2C1C2203A800B13AA6 /* main.m */,
 			);
@@ -248,12 +269,19 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27807F221C56AD3D0017791C /* 6.jpg in Resources */,
 				27E1DD361C2203A800B13AA6 /* Main.storyboard in Resources */,
+				27807F211C56AD3D0017791C /* 5.jpg in Resources */,
+				27807F231C56AD3D0017791C /* 7.jpg in Resources */,
 				27069D601C329C9D00C06BAF /* Maximum Track Image.png in Resources */,
+				27807F241C56AD3D0017791C /* 8.jpg in Resources */,
+				27807F1E1C56AD3D0017791C /* 2.jpg in Resources */,
 				27069D611C329C9D00C06BAF /* Minimum Track Image.png in Resources */,
+				27807F1D1C56AD3D0017791C /* 1.jpg in Resources */,
 				27E1DD3B1C2203A800B13AA6 /* LaunchScreen.xib in Resources */,
+				27807F201C56AD3D0017791C /* 4.jpg in Resources */,
 				27E1DD381C2203A800B13AA6 /* Images.xcassets in Resources */,
-				277F4D9A1C2240CE0015710E /* 13 Rose.jpg in Resources */,
+				27807F1F1C56AD3D0017791C /* 3.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
