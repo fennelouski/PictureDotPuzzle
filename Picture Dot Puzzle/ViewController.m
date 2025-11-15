@@ -22,7 +22,7 @@ static CGFloat const toolbarHeight = 44.0f;
 
 @interface ViewController ()  <PHPickerViewControllerDelegate, PDPTouchInterceptViewDelegate>
 
-@property (nonatomic, strong) NSMutableArray *dots;
+@property (nonatomic, strong) NSMutableArray<PDPDotView *> *dots;
 
 @property (nonatomic) NSInteger numberOfRows, numberOfColumns;
 
@@ -174,8 +174,9 @@ static CGFloat const toolbarHeight = 44.0f;
         _backgroundImageView = [[UIImageView alloc] initWithFrame:self.view.bounds];
         _backgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
         _backgroundImageView.alpha = 0.5f; // allow the background view to be subtle
+        _backgroundImageView.isAccessibilityElement = NO; // Decorative element
     }
-    
+
     return _backgroundImageView;
 }
 
@@ -197,8 +198,10 @@ static CGFloat const toolbarHeight = 44.0f;
         _rootDotContainer.center = self.view.center;
         [_rootDotContainer addSubview:self.rootDot];
         [_rootDotContainer addSubview:self.interceptView];
+        _rootDotContainer.accessibilityLabel = @"Puzzle Canvas";
+        _rootDotContainer.accessibilityHint = @"Touch or drag to subdivide dots and reveal the image";
     }
-    
+
     return _rootDotContainer;
 }
 
@@ -355,8 +358,9 @@ static CGFloat const toolbarHeight = 44.0f;
         _originalImageView.frame = self.rootDotContainer.frame;
         _originalImageView.clipsToBounds = YES;
         _originalImageView.layer.cornerRadius = [PDPDataManager sharedDataManager].cornerRadius;
+        _originalImageView.isAccessibilityElement = NO; // Decorative element
     }
-    
+
     return _originalImageView;
 }
 
@@ -627,29 +631,30 @@ static CGFloat const toolbarHeight = 44.0f;
 
 - (void)checkForUpdateFromTouchPoint:(CGPoint)p {
     BOOL shouldUpdate = NO;
-    
+
     if (self.footerToolbar.orientation == NKFToolbarOrientationHorizontal) {
         CGFloat possibleTouchHeight = [self possibleTouchHeight];
-        
+
         if (p.y > self.view.frame.size.height - possibleTouchHeight || p.y < possibleTouchHeight) {
-            
+
             _showToolBars = !_showToolBars;
-            
+
             shouldUpdate = YES;
         }
     } else {
         CGFloat possibleTouchWidth = [self possibleTouchWidth];
-        
+
         if (p.x > self.view.frame.size.width - possibleTouchWidth || p.x < possibleTouchWidth) {
-            
+
             _showToolBars = !_showToolBars;
-            
+
             shouldUpdate = YES;
         }
     }
-    
+
     if (shouldUpdate) {
-        [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
+        NSTimeInterval duration = UIAccessibilityIsReduceMotionEnabled() ? 0.0 : [PDPDataManager sharedDataManager].animationDuration;
+        [UIView animateWithDuration:duration
                          animations:^{
                              [self updateViewConstraints];
                          }];
@@ -771,6 +776,19 @@ static CGFloat const toolbarHeight = 44.0f;
 
     PHPickerResult *result = results.firstObject;
     [result.itemProvider loadObjectOfClass:[UIImage class] completionHandler:^(__kindof id<NSItemProviderReading> _Nullable object, NSError * _Nullable error) {
+        // Handle errors from image loading
+        if (error != nil) {
+            NSLog(@"Error loading image from picker: %@", error.localizedDescription);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error Loading Image"
+                                                                               message:@"Could not load the selected image. Please try again."
+                                                                        preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
+            });
+            return;
+        }
+
         if ([object isKindOfClass:[UIImage class]]) {
             UIImage *image = (UIImage *)object;
 
@@ -784,6 +802,8 @@ static CGFloat const toolbarHeight = 44.0f;
                                                                   maskImage:image];
                 self.originalImageView.image = image;
             });
+        } else {
+            NSLog(@"Unexpected object type from image picker: %@", [object class]);
         }
     }];
 }
@@ -1042,13 +1062,14 @@ static CGFloat const toolbarHeight = 44.0f;
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:touch.view];
-    
+
     if (CGRectContainsPoint(self.rootDotContainer.frame, [touch locationInView:self.view])) {
         [self checkForDotsAtPoint:touchLocation];
-        
+
         if (_showToolBars) {
             _showToolBars = NO;
-            [UIView animateWithDuration:[PDPDataManager sharedDataManager].animationDuration
+            NSTimeInterval duration = UIAccessibilityIsReduceMotionEnabled() ? 0.0 : [PDPDataManager sharedDataManager].animationDuration;
+            [UIView animateWithDuration:duration
                              animations:^{
                                  [self updateToolbars];
                              }];

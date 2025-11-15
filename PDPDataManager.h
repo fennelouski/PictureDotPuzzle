@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+@class PDPDotView;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PDPDataManager : NSObject
@@ -36,9 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  The collection of all dots currently on screen.
  */
-@property (nonatomic, strong) NSHashTable *allDots;
+@property (nonatomic, strong) NSHashTable<PDPDotView *> *allDots;
 @property (nonatomic) BOOL canMutateAllDots;
-@property (nonatomic, strong) NSHashTable *reserveDots;
+@property (nonatomic, strong) NSHashTable<PDPDotView *> *reserveDots;
 
 /**
  *
