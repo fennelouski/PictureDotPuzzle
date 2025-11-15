@@ -7,6 +7,7 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSInteger, NGAParallaxDirectionConstraint) {
     NGAParallaxDirectionConstraintAll = 0,
@@ -27,3 +28,5 @@ typedef NS_ENUM(NSInteger, NGAParallaxDirectionConstraint) {
 @property (nonatomic) NGAParallaxDirectionConstraint parallaxDirectionConstraint;
 
 @end
+
+NS_ASSUME_NONNULL_END
