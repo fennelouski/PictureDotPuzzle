@@ -14,12 +14,13 @@
 #import "UIImage+ImageEffects.h"
 #import "NGAParallaxMotion.h"
 #import "NKFToolbar.h"
+#import <PhotosUI/PhotosUI.h>
 
 #define degreesToRadians(x) (M_PI * (x) / 180.0)
 
 static CGFloat const toolbarHeight = 44.0f;
 
-@interface ViewController ()  <UIImagePickerControllerDelegate, UINavigationControllerDelegate, PDPTouchInterceptViewDelegate>
+@interface ViewController ()  <PHPickerViewControllerDelegate, PDPTouchInterceptViewDelegate>
 
 @property (nonatomic, strong) NSMutableArray *dots;
 
@@ -42,11 +43,13 @@ static CGFloat const toolbarHeight = 44.0f;
 @property (nonatomic, strong) NKFToolbar *headerToolbar;
 @property (nonatomic, strong) UISlider *cornerRadiusSlider;
 
-@property (nonatomic, strong) UIImagePickerController *imagePicker;
+@property (nonatomic, strong) PHPickerViewController *imagePicker;
 
 @property (nonatomic, strong) UIImageView *backgroundImageView;
 
 @property (nonatomic, strong) UIImageView *originalImageView;
+
+@property (nonatomic, strong) CADisplayLink *displayLink;
 
 @end
 
@@ -74,8 +77,12 @@ static CGFloat const toolbarHeight = 44.0f;
     [self.view addGestureRecognizer:self.swipeLeft];
     [self.view addGestureRecognizer:self.swipeRight];
     [self.view addGestureRecognizer:self.tap];
-    
-    _preferredStatusBarStyle = UIStatusBarStyleDefault;
+
+    if (@available(iOS 13.0, *)) {
+        _preferredStatusBarStyle = UIStatusBarStyleDarkContent;
+    } else {
+        _preferredStatusBarStyle = UIStatusBarStyleDefault;
+    }
     [self updateBackgroundColorWithImage:[PDPDataManager sharedDataManager].image];
     
     [self updateToolbars];
@@ -90,12 +97,11 @@ static CGFloat const toolbarHeight = 44.0f;
                            selector:@selector(updateViewConstraints)
                                name:UIDeviceOrientationDidChangeNotification
                              object:nil];
-    
-    [NSTimer scheduledTimerWithTimeInterval:0.2f
-                                     target:self
-                                   selector:@selector(updateLoop)
-                                   userInfo:nil
-                                    repeats:YES];
+
+    // Use CADisplayLink for smooth 60Hz updates instead of NSTimer
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateLoop)];
+    self.displayLink.preferredFramesPerSecond = 5; // Update 5 times per second (was 0.2s = 5Hz)
+    [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -136,9 +142,17 @@ static CGFloat const toolbarHeight = 44.0f;
         return;
     }
     
-    if ([UIApplication sharedApplication].statusBarFrame.size.height > 20.0f) {
+    // Use Safe Area insets for modern iOS devices (notch, Dynamic Island)
+    CGFloat topInset = 0.0f;
+    if (@available(iOS 11.0, *)) {
+        topInset = self.view.safeAreaInsets.top;
+    }
+
+    if (topInset > 20.0f) {
+        // Adjust for devices with notch or Dynamic Island
+        CGFloat offset = (topInset - 20.0f) * 0.5f;
         self.rootDotContainer.center = CGPointMake(self.view.frame.size.width * 0.5f,
-                                                   self.view.frame.size.height * 0.5f - [UIApplication sharedApplication].statusBarFrame.size.height + 20.0f);
+                                                   self.view.frame.size.height * 0.5f - offset);
     } else {
         self.rootDotContainer.center = self.view.center;
     }
@@ -330,15 +344,16 @@ static CGFloat const toolbarHeight = 44.0f;
 
 #pragma mark - View Controllers
 
-- (UIImagePickerController *)imagePicker {
+- (PHPickerViewController *)imagePicker {
     if (!_imagePicker) {
-        _imagePicker = [[UIImagePickerController alloc] init];
-        _imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+        PHPickerConfiguration *config = [[PHPickerConfiguration alloc] init];
+        config.selectionLimit = 1;
+        config.filter = [PHPickerFilter imagesFilter];
+
+        _imagePicker = [[PHPickerViewController alloc] initWithConfiguration:config];
         _imagePicker.delegate = self;
-        _imagePicker.allowsEditing = YES;
-        _imagePicker.navigationBarHidden = YES;
     }
-    
+
     return _imagePicker;
 }
 
@@ -723,34 +738,35 @@ static CGFloat const toolbarHeight = 44.0f;
 
 
 
-#pragma mark - Image Picker Delegate
+#pragma mark - PHPicker Delegate
 
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [self.originalImageView removeFromSuperview];
-    [picker dismissViewControllerAnimated:YES
-                               completion:^{
-                                   _imagePickerPresented = NO;
-                               }];
-}
+- (void)picker:(PHPickerViewController *)picker didFinishPicking:(NSArray<PHPickerResult *> *)results {
+    [picker dismissViewControllerAnimated:YES completion:^{
+        self->_imagePickerPresented = NO;
+    }];
 
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    UIImage *image = [info objectForKey:UIImagePickerControllerEditedImage];
-    
-    UIImage *originalImage = [info objectForKey:UIImagePickerControllerOriginalImage];
-    NSLog(@"Original Image Size: %g, %g", originalImage.size.width, originalImage.size.height);
-    
-    [self updateBackgroundColorWithImage:image];
-    self.backgroundImageView.image = [image applyBlurWithRadius:2.0f
-                                                      tintColor:self.backgroundColor
-                                          saturationDeltaFactor:0.2f
-                                                      maskImage:image];
-    self.originalImageView.image = image;
-    
-    
-    [picker dismissViewControllerAnimated:YES
-                               completion:^{
-                                   _imagePickerPresented = NO;
-                               }];
+    if (results.count == 0) {
+        [self.originalImageView removeFromSuperview];
+        return;
+    }
+
+    PHPickerResult *result = results.firstObject;
+    [result.itemProvider loadObjectOfClass:[UIImage class] completionHandler:^(__kindof id<NSItemProviderReading> _Nullable object, NSError * _Nullable error) {
+        if ([object isKindOfClass:[UIImage class]]) {
+            UIImage *image = (UIImage *)object;
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSLog(@"Original Image Size: %g, %g", image.size.width, image.size.height);
+
+                [self updateBackgroundColorWithImage:image];
+                self.backgroundImageView.image = [image applyBlurWithRadius:2.0f
+                                                                  tintColor:self.backgroundColor
+                                                      saturationDeltaFactor:0.2f
+                                                                  maskImage:image];
+                self.originalImageView.image = image;
+            });
+        }
+    }];
 }
 
 - (void)updateBackgroundColorWithImage:(UIImage *)image {
@@ -783,7 +799,11 @@ static CGFloat const toolbarHeight = 44.0f;
     if (brightness > 0.5f) {
         brightness *= 0.5f;
         saturation = 1.0f - saturation * 0.5f;
-        _preferredStatusBarStyle = UIStatusBarStyleDefault;
+        if (@available(iOS 13.0, *)) {
+            _preferredStatusBarStyle = UIStatusBarStyleDarkContent;
+        } else {
+            _preferredStatusBarStyle = UIStatusBarStyleDefault;
+        }
         for (UIBarButtonItem *barButtonItem in self.footerToolbar.items) {
             barButtonItem.tintColor = [UIColor colorWithHue:hue
                                                  saturation:saturation
@@ -1045,22 +1065,21 @@ static CGFloat const toolbarHeight = 44.0f;
 
 - (UIImage *)imageFromView:(UIView *) view {
     CGFloat scale = [UIScreen mainScreen].scale;
-    
+
     if (view.bounds.size.width + view.bounds.size.height > 1200) {
         scale *= 2;
     }
-    
-    if (scale > 1) {
-        UIGraphicsBeginImageContextWithOptions(view.bounds.size, NO, scale);
-    } else {
-        UIGraphicsBeginImageContext(view.bounds.size);
-    }
-    
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    [view.layer renderInContext: context];
-    UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
+
+    UIGraphicsImageRendererFormat *format = [[UIGraphicsImageRendererFormat alloc] init];
+    format.scale = scale;
+    format.opaque = NO;
+
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:view.bounds.size format:format];
+
+    UIImage *viewImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+        [view.layer renderInContext:rendererContext.CGContext];
+    }];
+
     return viewImage;
 }
 
@@ -1078,6 +1097,11 @@ static CGFloat const toolbarHeight = 44.0f;
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)dealloc {
+    [self.displayLink invalidate];
+    self.displayLink = nil;
 }
 
 @end
