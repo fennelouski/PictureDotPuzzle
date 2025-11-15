@@ -23,19 +23,23 @@
 #pragma mark - Marge two Images
 
 - (UIImage *) addImageToImage:(UIImage *)img atRect:(CGRect)cropRect{
-    
+
     CGSize size = CGSizeMake(self.size.width, self.size.height);
-    UIGraphicsBeginImageContextWithOptions(size, NO, self.scale);
-    
-    CGPoint pointImg1 = CGPointMake(0,0);
-    [self drawAtPoint:pointImg1];
-    
-    CGPoint pointImg2 = cropRect.origin;
-    [img drawAtPoint: pointImg2];
-    
-    UIImage* result = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
+
+    UIGraphicsImageRendererFormat *format = [[UIGraphicsImageRendererFormat alloc] init];
+    format.scale = self.scale;
+    format.opaque = NO;
+
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:size format:format];
+
+    UIImage *result = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+        CGPoint pointImg1 = CGPointMake(0,0);
+        [self drawAtPoint:pointImg1];
+
+        CGPoint pointImg2 = cropRect.origin;
+        [img drawAtPoint: pointImg2];
+    }];
+
     return result;
 }
 
@@ -90,24 +94,34 @@
 }
 
 + (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize {
-    //UIGraphicsBeginImageContext(newSize);
-    // In next line, pass 0.0 to use the current device's pixel scaling factor (and thus account for Retina resolution).
-    // Pass 1.0 to force exact pixel size.
-    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
-    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+    // Using UIGraphicsImageRenderer for modern iOS compatibility
+    // Pass 0.0 to use the current device's pixel scaling factor (and thus account for Retina resolution).
+    UIGraphicsImageRendererFormat *format = [[UIGraphicsImageRendererFormat alloc] init];
+    format.scale = 0.0;
+    format.opaque = NO;
+
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:newSize format:format];
+
+    UIImage *newImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+        [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    }];
+
     return newImage;
 }
 
 - scaledToSize:(CGSize)newSize {
-    //UIGraphicsBeginImageContext(newSize);
-    // In next line, pass 0.0 to use the current device's pixel scaling factor (and thus account for Retina resolution).
-    // Pass 1.0 to force exact pixel size.
-    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
-    [self drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+    // Using UIGraphicsImageRenderer for modern iOS compatibility
+    // Pass 0.0 to use the current device's pixel scaling factor (and thus account for Retina resolution).
+    UIGraphicsImageRendererFormat *format = [[UIGraphicsImageRendererFormat alloc] init];
+    format.scale = 0.0;
+    format.opaque = NO;
+
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:newSize format:format];
+
+    UIImage *newImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+        [self drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    }];
+
     return newImage;
 }
 
