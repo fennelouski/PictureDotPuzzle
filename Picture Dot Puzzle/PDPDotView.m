@@ -12,7 +12,7 @@
 
 @interface PDPDotView ()
 
-@property (nonatomic, strong) NSMutableArray *subdivisions;
+@property (nonatomic, strong) NSMutableArray<PDPDotView *> *subdivisions;
 
 @property (nonatomic, strong) UITapGestureRecognizer *tap;
 @property (nonatomic, strong) UISwipeGestureRecognizer *swipe;
@@ -31,22 +31,26 @@ static NSInteger const numberOfSubdivisions = 2;
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    
+
     if (self) {
         [self addTarget:self
                  action:@selector(dragged:)
        forControlEvents:UIControlEventTouchDragEnter | UIControlEventTouchDragExit];
-        
+
         self.dotNumber = [PDPDataManager sharedDataManager].dotNumber++;
-        
+
         self.layoutColor = YES;
-        
+
         self.relativeSize = CGSizeMake(1.0f,
                                        1.0f);
         self.relativeCenter = CGPointMake(0.5f,
                                           0.5f);
+
+        // Mark as non-accessible element - there can be hundreds of dots
+        // Users interact with the canvas as a whole, not individual dots
+        self.isAccessibilityElement = NO;
     }
-    
+
     return self;
 }
 
@@ -126,9 +130,12 @@ static NSInteger const numberOfSubdivisions = 2;
 }
 
 - (void)layoutSubdivisions {
+    NSAssert(self.rootView != nil, @"rootView must be set before subdividing");
+    NSAssert(self.isDivided, @"isDivided must be YES before calling layoutSubdivisions");
+
     if (!self.subdivisions) {
         self.subdivisions = [NSMutableArray new];
-        
+
         for (int row = 0; row < numberOfSubdivisions; row++) {
             for (int column = 0; column < numberOfSubdivisions; column++) {
                 PDPDotView *dot = [[PDPDotView alloc] initWithFrame:self.frame];
@@ -147,6 +154,10 @@ static NSInteger const numberOfSubdivisions = 2;
                 dot.relativeCenter = CGPointMake(finalFrameCenter.x / self.rootView.bounds.size.width,
                                                   finalFrameCenter.y / self.rootView.bounds.size.height);
                 
+                // Respect Reduce Motion preference
+                BOOL shouldAnimate = !UIAccessibilityIsReduceMotionEnabled() && self.divisionLevel <= 4;
+                NSTimeInterval animationDuration = shouldAnimate ? [[PDPDataManager sharedDataManager] animationDuration] : 0.0;
+
                 if ([PDPDataManager sharedDataManager].cornerRadius == 0.5f) {
                     CGPoint startingCenter = CGPointMake((finalFrameCenter.x + dot.center.x) * 0.5f,
                                                          (finalFrameCenter.y + dot.center.y) * 0.5f);
@@ -156,14 +167,14 @@ static NSInteger const numberOfSubdivisions = 2;
                                            self.frame.size.width * scale,
                                            self.frame.size.height * scale);
                     dot.center = startingCenter;
-                    
-                    [UIView animateWithDuration:(self.divisionLevel > 4) ? 0.0f : [[PDPDataManager sharedDataManager] animationDuration]
+
+                    [UIView animateWithDuration:animationDuration
                                      animations:^{
                                          dot.frame = finalFrame;
                                          self.backgroundColor = [self colorAtPoint:finalFrameCenter];
                                      }];
                 } else {
-                    [UIView animateWithDuration:(self.divisionLevel > 4) ? 0.0f : [[PDPDataManager sharedDataManager] animationDuration]
+                    [UIView animateWithDuration:animationDuration
                                      animations:^{
                                          dot.frame = [self frameForRow:row
                                                                 column:column];
