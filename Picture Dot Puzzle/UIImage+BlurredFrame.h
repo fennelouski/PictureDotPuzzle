@@ -7,26 +7,30 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface UIImage (BlurredFrame)
 
-- (UIImage *)applyLightBluredAtFrame:(CGRect)frame __attribute__((deprecated));
+- (nullable UIImage *)applyLightBluredAtFrame:(CGRect)frame __attribute__((deprecated));
 
-- (UIImage *)applyLightEffectAtFrame:(CGRect)frame;
-- (UIImage *)applyExtraLightEffectAtFrame:(CGRect)frame;
-- (UIImage *)applyDarkEffectAtFrame:(CGRect)frame;
-- (UIImage *)applyTintEffectWithColor:(UIColor *)tintColor atFrame:(CGRect)frame;
-- (UIImage *)applyBlurWithRadius:(CGFloat)blurRadius
-                       tintColor:(UIColor *)tintColor
-           saturationDeltaFactor:(CGFloat)saturationDeltaFactor
-                       maskImage:(UIImage *)maskImage
-                         atFrame:(CGRect)frame;
-- (UIImage *)applyBlurWithRadius:(CGFloat)blurRadius
-                 iterationsCount:(NSInteger)iterationsCount
-                       tintColor:(UIColor *)tintColor
-           saturationDeltaFactor:(CGFloat)saturationDeltaFactor
-                       maskImage:(UIImage *)maskImage
-                         atFrame:(CGRect)frame;
-+ (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize;
-- scaleToSize:(CGSize)newSize;
+- (nullable UIImage *)applyLightEffectAtFrame:(CGRect)frame;
+- (nullable UIImage *)applyExtraLightEffectAtFrame:(CGRect)frame;
+- (nullable UIImage *)applyDarkEffectAtFrame:(CGRect)frame;
+- (nullable UIImage *)applyTintEffectWithColor:(UIColor *)tintColor atFrame:(CGRect)frame;
+- (nullable UIImage *)applyBlurWithRadius:(CGFloat)blurRadius
+                                tintColor:(nullable UIColor *)tintColor
+                    saturationDeltaFactor:(CGFloat)saturationDeltaFactor
+                                maskImage:(nullable UIImage *)maskImage
+                                  atFrame:(CGRect)frame;
+- (nullable UIImage *)applyBlurWithRadius:(CGFloat)blurRadius
+                          iterationsCount:(NSInteger)iterationsCount
+                                tintColor:(nullable UIColor *)tintColor
+                    saturationDeltaFactor:(CGFloat)saturationDeltaFactor
+                                maskImage:(nullable UIImage *)maskImage
+                                  atFrame:(CGRect)frame;
++ (nullable UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize;
+- (nullable id)scaleToSize:(CGSize)newSize;
 
 @end
+
+NS_ASSUME_NONNULL_END

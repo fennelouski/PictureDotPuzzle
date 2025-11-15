@@ -1,6 +1,6 @@
 //
 //  PDPDataManager.h
-//  
+//
 //
 //  Created by HAI on 12/16/15.
 //
@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface PDPDataManager : NSObject
 
@@ -36,7 +38,7 @@
  */
 @property (nonatomic, strong) NSHashTable *allDots;
 @property (nonatomic) BOOL canMutateAllDots;
-@property (nonatomic) NSHashTable *reserveDots;
+@property (nonatomic, strong) NSHashTable *reserveDots;
 
 /**
  *
@@ -55,8 +57,8 @@
  *
  *  @return The image being used to create new dots
  */
-- (UIImage *)image;
-- (void)setImage:(UIImage *)image;
+- (nullable UIImage *)image;
+- (void)setImage:(nullable UIImage *)image;
 
 
 
@@ -64,3 +66,5 @@
 - (NSString *)deviceType;
 
 @end
+
+NS_ASSUME_NONNULL_END

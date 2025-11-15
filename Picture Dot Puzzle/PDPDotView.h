@@ -1,6 +1,6 @@
 //
 //  PDPDotView.h
-//  
+//
 //
 //  Created by HAI on 12/16/15.
 //
@@ -8,11 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface PDPDotView : UIButton
 
 @property (nonatomic) BOOL isDivided;
 
-@property (nonatomic, strong) UIView *rootView;
+@property (nonatomic, strong, nullable) UIView *rootView;
 
 @property (nonatomic) NSInteger divisionLevel;
 
@@ -30,3 +32,5 @@
 - (void)removeSubdivisions;
 
 @end
+
+NS_ASSUME_NONNULL_END

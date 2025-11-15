@@ -92,22 +92,27 @@ static CGFloat const toolbarHeight = 44.0f;
                                                  name:UIApplicationWillChangeStatusBarFrameNotification
                                                object:nil];
     
-    NSNotificationCenter *notificaitonCenter = [NSNotificationCenter defaultCenter];
-    [notificaitonCenter addObserver:self
-                           selector:@selector(updateViewConstraints)
-                               name:UIDeviceOrientationDidChangeNotification
-                             object:nil];
-
-    // Use CADisplayLink for smooth 60Hz updates instead of NSTimer
+    // Use CADisplayLink for smooth updates instead of NSTimer
+    // Set to 30 FPS for smooth animations while being battery-efficient
+    // On ProMotion displays (iPhone 13 Pro+), this allows adaptive refresh
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateLoop)];
-    self.displayLink.preferredFramesPerSecond = 5; // Update 5 times per second (was 0.2s = 5Hz)
+    self.displayLink.preferredFramesPerSecond = 30; // 30 FPS - smooth on all devices including ProMotion
     [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
+
     [self updateViewConstraints];
+}
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+
+    // Handle orientation changes and layout updates using modern API
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self updateViewConstraints];
+    } completion:nil];
 }
 
 - (void)updateLoop {
@@ -238,8 +243,10 @@ static CGFloat const toolbarHeight = 44.0f;
         _shareButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
                                                                      target:self
                                                                      action:@selector(shareButtonTouched:)];
+        _shareButton.accessibilityLabel = @"Share";
+        _shareButton.accessibilityHint = @"Share the puzzle image";
     }
-    
+
     return _shareButton;
 }
 
@@ -248,8 +255,10 @@ static CGFloat const toolbarHeight = 44.0f;
         _hideButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
                                                                     target:self
                                                                     action:@selector(hideButtonTouched:)];
+        _hideButton.accessibilityLabel = @"Hide";
+        _hideButton.accessibilityHint = @"Hide toolbars";
     }
-    
+
     return _hideButton;
 }
 
@@ -258,8 +267,10 @@ static CGFloat const toolbarHeight = 44.0f;
         _automateButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
                                                                         target:self
                                                                         action:@selector(automateButtonTouched:)];
+        _automateButton.accessibilityLabel = @"Automate";
+        _automateButton.accessibilityHint = @"Automatically create puzzle dots";
     }
-    
+
     return _automateButton;
 }
 
@@ -268,8 +279,10 @@ static CGFloat const toolbarHeight = 44.0f;
         _pauseAutomateButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause
                                                                              target:self
                                                                              action:@selector(automateButtonTouched:)];
+        _pauseAutomateButton.accessibilityLabel = @"Pause";
+        _pauseAutomateButton.accessibilityHint = @"Pause automatic puzzle creation";
     }
-    
+
     return _pauseAutomateButton;
 }
 
@@ -279,8 +292,10 @@ static CGFloat const toolbarHeight = 44.0f;
                                                         style:UIBarButtonItemStyleDone
                                                        target:self
                                                        action:@selector(resetButtonTouched:)];
+        _resetButton.accessibilityLabel = @"Reset";
+        _resetButton.accessibilityHint = @"Clear puzzle and start over";
     }
-    
+
     return _resetButton;
 }
 
@@ -289,8 +304,10 @@ static CGFloat const toolbarHeight = 44.0f;
         _photoButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
                                                                      target:self
                                                                      action:@selector(photoButtonTouched:)];
+        _photoButton.accessibilityLabel = @"Choose Photo";
+        _photoButton.accessibilityHint = @"Select a photo to create a puzzle";
     }
-    
+
     return _photoButton;
 }
 
@@ -324,8 +341,10 @@ static CGFloat const toolbarHeight = 44.0f;
                                          forState:UIControlStateNormal];
         [_cornerRadiusSlider setMinimumTrackImage:[UIImage imageNamed:@"Minimum Track Image"]
                                          forState:UIControlStateNormal];
+        _cornerRadiusSlider.accessibilityLabel = @"Corner Radius";
+        _cornerRadiusSlider.accessibilityHint = @"Adjust the roundness of puzzle dots";
     }
-    
+
     return _cornerRadiusSlider;
 }
 

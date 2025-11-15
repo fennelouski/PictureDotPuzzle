@@ -8,9 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ViewController : UIViewController
 
-@property (nonatomic, strong) UIColor *backgroundColor, *accentColor1, *accentColor2;
+@property (nonatomic, strong, nullable) UIColor *backgroundColor;
+@property (nonatomic, strong, nullable) UIColor *accentColor1;
+@property (nonatomic, strong, nullable) UIColor *accentColor2;
 
 @end
+
+NS_ASSUME_NONNULL_END
 

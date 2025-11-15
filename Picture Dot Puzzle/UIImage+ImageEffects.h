@@ -96,15 +96,19 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface UIImage (ImageEffects)
 
-- (UIImage *)applyLightEffect;
-- (UIImage *)applyExtraLightEffect;
-- (UIImage *)applyDarkEffect;
-- (UIImage *)applyTintEffectWithColor:(UIColor *)tintColor;
+- (nullable UIImage *)applyLightEffect;
+- (nullable UIImage *)applyExtraLightEffect;
+- (nullable UIImage *)applyDarkEffect;
+- (nullable UIImage *)applyTintEffectWithColor:(UIColor *)tintColor;
 
-- (UIImage *)applyBlurWithRadius:(CGFloat)blurRadius tintColor:(UIColor *)tintColor saturationDeltaFactor:(CGFloat)saturationDeltaFactor maskImage:(UIImage *)maskImage;
+- (nullable UIImage *)applyBlurWithRadius:(CGFloat)blurRadius tintColor:(nullable UIColor *)tintColor saturationDeltaFactor:(CGFloat)saturationDeltaFactor maskImage:(nullable UIImage *)maskImage;
 
-- (UIImage *)applyBlurWithRadius:(CGFloat)blurRadius iterationsCount:(NSInteger)iterationsCount tintColor:(UIColor *)tintColor saturationDeltaFactor:(CGFloat)saturationDeltaFactor maskImage:(UIImage *)maskImage;
+- (nullable UIImage *)applyBlurWithRadius:(CGFloat)blurRadius iterationsCount:(NSInteger)iterationsCount tintColor:(nullable UIColor *)tintColor saturationDeltaFactor:(CGFloat)saturationDeltaFactor maskImage:(nullable UIImage *)maskImage;
 
 @end
+
+NS_ASSUME_NONNULL_END
