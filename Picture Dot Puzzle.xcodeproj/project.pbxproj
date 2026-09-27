@@ -32,6 +32,11 @@
 		27E1DD381C2203A800B13AA6 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27E1DD371C2203A800B13AA6 /* Images.xcassets */; };
 		27E1DD3B1C2203A800B13AA6 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 27E1DD391C2203A800B13AA6 /* LaunchScreen.xib */; };
 		27E1DD471C2203A800B13AA6 /* Picture_Dot_PuzzleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E1DD461C2203A800B13AA6 /* Picture_Dot_PuzzleTests.m */; };
+		A20000000000000000000001 = {isa = PBXBuildFile; fileRef = A10000000000000000000001; };
+		A20000000000000000000002 = {isa = PBXBuildFile; fileRef = A10000000000000000000002; };
+		A20000000000000000000003 = {isa = PBXBuildFile; fileRef = A10000000000000000000003; };
+		A20000000000000000000004 = {isa = PBXBuildFile; fileRef = A10000000000000000000004; };
+		A20000000000000000000005 = {isa = PBXBuildFile; fileRef = A10000000000000000000005; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,8 +50,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2705A9EB1C370F56009B1FFF /* NKFToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NKFToolbar.h; path = "../../Toolbar Test/Toolbar Test/NKFToolbar.h"; sourceTree = "<group>"; };
-		2705A9EC1C370F56009B1FFF /* NKFToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NKFToolbar.m; path = "../../Toolbar Test/Toolbar Test/NKFToolbar.m"; sourceTree = "<group>"; };
+		2705A9EB1C370F56009B1FFF /* NKFToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NKFToolbar.h; path = NKFToolbar.h; sourceTree = "<group>"; };
+		2705A9EC1C370F56009B1FFF /* NKFToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NKFToolbar.m; path = NKFToolbar.m; sourceTree = "<group>"; };
 		27069D5B1C317A5C00C06BAF /* NGAParallaxMotion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NGAParallaxMotion.h; sourceTree = "<group>"; };
 		27069D5C1C317A5C00C06BAF /* NGAParallaxMotion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NGAParallaxMotion.m; sourceTree = "<group>"; };
 		27069D5E1C329C9D00C06BAF /* Maximum Track Image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Maximum Track Image.png"; sourceTree = "<group>"; };
@@ -84,6 +89,11 @@
 		27E1DD401C2203A800B13AA6 /* Picture Dot PuzzleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Picture Dot PuzzleTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E1DD451C2203A800B13AA6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		27E1DD461C2203A800B13AA6 /* Picture_Dot_PuzzleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Picture_Dot_PuzzleTests.m; sourceTree = "<group>"; };
+		A10000000000000000000001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CirclesApp.swift"; sourceTree = "<group>"; };
+		A10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "PDPRenderCore.c"; sourceTree = "<group>"; };
+		A10000000000000000000003 = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "PrivacyInfo.xcprivacy"; sourceTree = "<group>"; };
+		A10000000000000000000004 = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Base.lproj/LaunchScreen.storyboard"; sourceTree = "<group>"; };
+		A10000000000000000000005 = {isa = PBXFileReference; lastKnownFileType = text; path = ThirdPartyNotices.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +135,11 @@
 		27E1DD291C2203A800B13AA6 /* Picture Dot Puzzle */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000005,
+				A10000000000000000000004,
+				A10000000000000000000003,
+				A10000000000000000000002,
+				A10000000000000000000001,
 				27E1DD2E1C2203A800B13AA6 /* AppDelegate.h */,
 				27E1DD2F1C2203A800B13AA6 /* AppDelegate.m */,
 				27E1DD311C2203A800B13AA6 /* ViewController.h */,
@@ -269,6 +284,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A20000000000000000000005,
+				A20000000000000000000004,
+				A20000000000000000000003,
 				27807F221C56AD3D0017791C /* 6.jpg in Resources */,
 				27E1DD361C2203A800B13AA6 /* Main.storyboard in Resources */,
 				27807F211C56AD3D0017791C /* 5.jpg in Resources */,
@@ -299,6 +317,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A20000000000000000000002,
+				A20000000000000000000001,
 				274C45941C22836100CD8E2F /* UIImage+BlurredFrame.m in Sources */,
 				277F4D981C223F2E0015710E /* PDPDataManager.m in Sources */,
 				277F4D9D1C225F360015710E /* UIImage+PixelInformation.m in Sources */,
@@ -387,7 +407,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -425,7 +445,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -438,7 +458,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = "Picture Dot Puzzle/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+                PRODUCT_BUNDLE_IDENTIFIER = com.nathanfennel.circlestothemax;
+                PRODUCT_MODULE_NAME = Circles;
+                SWIFT_VERSION = 5.0;
+                SWIFT_OBJC_BRIDGING_HEADER = "Picture Dot Puzzle/Circles-Bridging-Header.h";
+                DEVELOPMENT_TEAM = EJLR2RPSV2;
+                CODE_SIGN_STYLE = Automatic;
+                CODE_SIGN_IDENTITY = "Apple Development";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -449,7 +476,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = "Picture Dot Puzzle/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+                PRODUCT_BUNDLE_IDENTIFIER = com.nathanfennel.circlestothemax;
+                PRODUCT_MODULE_NAME = Circles;
+                SWIFT_VERSION = 5.0;
+                SWIFT_OBJC_BRIDGING_HEADER = "Picture Dot Puzzle/Circles-Bridging-Header.h";
+                DEVELOPMENT_TEAM = EJLR2RPSV2;
+                CODE_SIGN_STYLE = Automatic;
+                CODE_SIGN_IDENTITY = "Apple Development";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

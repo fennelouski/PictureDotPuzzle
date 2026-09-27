@@ -59,13 +59,17 @@ static CGFloat const toolbarHeight = 44.0f;
     BOOL _showToolBars;
     NSMutableArray *_recentTouchLocations;
     BOOL _automating;
+    NSUInteger _automationGeneration;
     NSMutableDictionary *_sliderImages;
     BOOL _imagePickerPresented;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    _showToolBars = YES;
+    [PDPDataManager.sharedDataManager.allDots removeAllObjects];
+    [PDPDataManager.sharedDataManager.reserveDots removeAllObjects];
+    PDPDataManager.sharedDataManager.dotNumber = 0;
     
     [self.view addSubview:self.backgroundImageView];
     [self.view addSubview:self.rootDotContainer];
@@ -87,10 +91,7 @@ static CGFloat const toolbarHeight = 44.0f;
     
     [self updateToolbars];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updateViewConstraints)
-                                                 name:UIApplicationWillChangeStatusBarFrameNotification
-                                               object:nil];
+
     
     // Use CADisplayLink for smooth updates instead of NSTimer
     // Set to 30 FPS for smooth animations while being battery-efficient
@@ -104,6 +105,18 @@ static CGFloat const toolbarHeight = 44.0f;
     [super viewDidAppear:animated];
 
     [self updateViewConstraints];
+    self.displayLink.paused = NO;
+    if (self.openPhotoPickerOnAppearance) {
+        self.openPhotoPickerOnAppearance = NO;
+        [self photoButtonTouched:self.photoButton];
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    _automating = NO;
+    _automationGeneration++;
+    self.displayLink.paused = YES;
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -123,6 +136,8 @@ static CGFloat const toolbarHeight = 44.0f;
                                                  0.0f,
                                                  self.view.bounds.size.width < self.view.bounds.size.height ? self.view.bounds.size.width : self.view.bounds.size.height,
                                                  self.view.bounds.size.width < self.view.bounds.size.height ? self.view.bounds.size.width : self.view.bounds.size.height);
+        self.interceptView.frame = self.rootDotContainer.bounds;
+        self.backgroundImageView.frame = self.view.bounds;
         self.rootDot.frame = self.rootDotContainer.bounds;
         [self.rootDot layoutSubviews];
         
@@ -159,7 +174,7 @@ static CGFloat const toolbarHeight = 44.0f;
         self.rootDotContainer.center = CGPointMake(self.view.frame.size.width * 0.5f,
                                                    self.view.frame.size.height * 0.5f - offset);
     } else {
-        self.rootDotContainer.center = self.view.center;
+        self.rootDotContainer.center = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds));
     }
     
     self.originalImageView.frame = self.rootDotContainer.bounds;
@@ -182,8 +197,8 @@ static CGFloat const toolbarHeight = 44.0f;
 
 - (PDPTouchInterceptView *)interceptView {
     if (!_interceptView) {
-        _interceptView.delegate = self;
         _interceptView = [[PDPTouchInterceptView alloc] initWithFrame:self.rootDotContainer.bounds];
+        _interceptView.delegate = self;
     }
     
     return _interceptView;
@@ -195,7 +210,7 @@ static CGFloat const toolbarHeight = 44.0f;
                                                                      0.0f,
                                                                      self.view.frame.size.width < self.view.frame.size.height ? self.view.frame.size.width : self.view.frame.size.height,
                                                                      self.view.frame.size.width < self.view.frame.size.height ? self.view.frame.size.width : self.view.frame.size.height)];
-        _rootDotContainer.center = self.view.center;
+        _rootDotContainer.center = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds));
         [_rootDotContainer addSubview:self.rootDot];
         [_rootDotContainer addSubview:self.interceptView];
         _rootDotContainer.accessibilityLabel = @"Puzzle Canvas";
@@ -392,6 +407,10 @@ static CGFloat const toolbarHeight = 44.0f;
 
 - (void)photoButtonTouched:(UIBarButtonItem *)photoButton {
     _automating = NO;
+    _automationGeneration++;
+    self.shareButton.enabled = YES;
+    self.cornerRadiusSlider.enabled = YES;
+    self.pauseAutomateButton.enabled = YES;
     [self updateFooterToolbarItems];
     _imagePickerPresented = YES;
     [self presentViewController:self.imagePicker
@@ -403,6 +422,10 @@ static CGFloat const toolbarHeight = 44.0f;
 
 - (void)resetButtonTouched:(UIBarButtonItem *)resetButton {
     _automating = NO;
+    _automationGeneration++;
+    self.shareButton.enabled = YES;
+    self.cornerRadiusSlider.enabled = YES;
+    self.pauseAutomateButton.enabled = YES;
     [self updateFooterToolbarItems];
     NSMutableArray *subviews = [[self.view subviews] mutableCopy];
     [subviews addObjectsFromArray:self.rootDotContainer.subviews];
@@ -416,9 +439,10 @@ static CGFloat const toolbarHeight = 44.0f;
     
     [self.rootDot removeSubdivisions];
     self.rootDot = nil;
+    [self.view addSubview:self.backgroundImageView];
+    [self.view addSubview:self.rootDotContainer];
     [self.view addSubview:self.footerToolbar];
     [self.view addSubview:self.headerToolbar];
-    [self.view addSubview:self.rootDotContainer];
 //    [self.rootDotContainer addSubview:self.originalImageView];
     [self.rootDotContainer addSubview:self.rootDot];
     [self.rootDotContainer addSubview:self.interceptView];
@@ -429,6 +453,10 @@ static CGFloat const toolbarHeight = 44.0f;
 
 - (void)shareButtonTouched:(UIBarButtonItem *)shareButton {
     _automating = NO;
+    _automationGeneration++;
+    self.shareButton.enabled = YES;
+    self.cornerRadiusSlider.enabled = YES;
+    self.pauseAutomateButton.enabled = YES;
     [self updateFooterToolbarItems];
     self.rootDotContainer.backgroundColor = self.accentColor2;
     [self.rootDotContainer addSubview:self.originalImageView];
@@ -490,7 +518,10 @@ static CGFloat const toolbarHeight = 44.0f;
     if (!_automating) {
         [self beginAutomation];
     } else {
-        _automating = !_automating;
+        _automating = NO;
+        _automationGeneration++;
+        self.shareButton.enabled = YES;
+        self.cornerRadiusSlider.enabled = YES;
     }
     
     [self updateFooterToolbarItems];
@@ -796,11 +827,12 @@ static CGFloat const toolbarHeight = 44.0f;
                 NSLog(@"Original Image Size: %g, %g", image.size.width, image.size.height);
 
                 [self updateBackgroundColorWithImage:image];
-                self.backgroundImageView.image = [image applyBlurWithRadius:2.0f
+                UIImage *normalizedImage = [PDPDataManager.sharedDataManager image];
+                self.backgroundImageView.image = [normalizedImage applyBlurWithRadius:2.0f
                                                                   tintColor:self.backgroundColor
                                                       saturationDeltaFactor:0.2f
-                                                                  maskImage:image];
-                self.originalImageView.image = image;
+                                                                  maskImage:normalizedImage];
+                self.originalImageView.image = normalizedImage;
             });
         } else {
             NSLog(@"Unexpected object type from image picker: %@", [object class]);
@@ -929,6 +961,7 @@ static CGFloat const toolbarHeight = 44.0f;
         return;
     } else {
         _automating = YES;
+        _automationGeneration++;
     }
     
     if (!_recentTouchLocations) {
@@ -937,12 +970,13 @@ static CGFloat const toolbarHeight = 44.0f;
         [_recentTouchLocations removeAllObjects];
     }
     
+    NSUInteger generation = _automationGeneration;
     NSTimeInterval duration = [PDPDataManager sharedDataManager].automationDuration;
     
     
     for (NSTimeInterval t = [PDPDataManager sharedDataManager].animationDuration, timeAddition = [PDPDataManager sharedDataManager].animationDuration; t < duration; t += timeAddition) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(t * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self touchAtRandom];
+            if (generation == self->_automationGeneration) [self touchAtRandom];
         });
         
         if (timeAddition > 0.05f) {
@@ -956,7 +990,7 @@ static CGFloat const toolbarHeight = 44.0f;
     }
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self finishTouches];
+        if (generation == self->_automationGeneration) [self finishTouches];
     });
 }
 
@@ -981,6 +1015,7 @@ static CGFloat const toolbarHeight = 44.0f;
         return;
     }
     
+    NSUInteger generation = _automationGeneration;
     NSTimeInterval t = [PDPDataManager sharedDataManager].animationDuration;
     
     BOOL didFindUndividedDot = NO;
@@ -994,20 +1029,21 @@ static CGFloat const toolbarHeight = 44.0f;
     [PDPDataManager sharedDataManager].canMutateAllDots = YES;
     
     NSArray *allDots = [copiedAllDots sortedArrayUsingComparator:^NSComparisonResult(PDPDotView *obj1, PDPDotView *obj2) {
-        return obj1.divisionLevel > obj2.divisionLevel;
+        return obj1.divisionLevel < obj2.divisionLevel ? NSOrderedAscending : obj1.divisionLevel > obj2.divisionLevel ? NSOrderedDescending : NSOrderedSame;
     }];
     
     float groupSize = exp2f([PDPDataManager sharedDataManager].maximumDivisionLevel);
     
-    for (float i = 0; i < allDots.count && i < groupSize; i++) {
+    for (NSUInteger i = 0; i < allDots.count && i < groupSize; i++) {
         PDPDotView *dot = [allDots objectAtIndex:i];
         
         if (!dot.isDivided) {
-            dot.isDivided = YES;
-            
             NSTimeInterval delay = (t / groupSize * i * t * i) * 0.2f;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [dot layoutSubviewsOnMainThread];
+                if (generation == self->_automationGeneration && self->_automating && !dot.isDivided) {
+                    dot.isDivided = YES;
+                    [dot layoutSubviews];
+                }
             });
             
             didFindUndividedDot = YES;
@@ -1016,9 +1052,10 @@ static CGFloat const toolbarHeight = 44.0f;
     
     if ([PDPDataManager sharedDataManager].dotNumber < [PDPDataManager sharedDataManager].totalNumberOfDotsPossible) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(t * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (generation != self->_automationGeneration || !self->_automating) return;
             [self touchAtRandom];
             [self finishTouches];
-            self.pauseAutomateButton.enabled = NO;
+            self.pauseAutomateButton.enabled = YES;
             self.shareButton.enabled = NO;
             self.cornerRadiusSlider.enabled = NO;
         });
@@ -1028,40 +1065,33 @@ static CGFloat const toolbarHeight = 44.0f;
         NSTimeInterval waitTime = 0.25f;
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(waitTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (generation != self->_automationGeneration) return;
             [self updateFooterToolbarItems];
             self.pauseAutomateButton.enabled = YES;
             self.shareButton.enabled = YES;
             self.cornerRadiusSlider.enabled = YES;
         });
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(waitTime * NSEC_PER_SEC)), dispatch_queue_create(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self replaceDotsWithImage];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(waitTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (generation == self->_automationGeneration) [self replaceDotsWithImage];
         });
     }
 }
 
 - (void)replaceDotsWithImage {
     UIImage *completedImage = [self imageFromView:self.rootDotContainer];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        for (PDPDotView *dot in [PDPDataManager sharedDataManager].allDots) {
-            [dot removeFromSuperview];
-        }
-        
-        UIImageView *completedImageView = [[UIImageView alloc] initWithImage:completedImage];
-        completedImageView.frame = self.rootDotContainer.bounds;
-        
-        [self.rootDotContainer addSubview:completedImageView];
-        
-        [self.rootDot removeSubdivisions];
-    });
+    for (PDPDotView *dot in [PDPDataManager sharedDataManager].allDots) [dot removeFromSuperview];
+    UIImageView *completedImageView = [[UIImageView alloc] initWithImage:completedImage];
+    completedImageView.frame = self.rootDotContainer.bounds;
+    [self.rootDotContainer addSubview:completedImageView];
+    [self.rootDot removeSubdivisions];
 }
 
 #pragma mark - Measuring Touches
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
-    CGPoint touchLocation = [touch locationInView:touch.view];
+    CGPoint touchLocation = [touch locationInView:self.rootDotContainer];
 
     if (CGRectContainsPoint(self.rootDotContainer.frame, [touch locationInView:self.view])) {
         [self checkForDotsAtPoint:touchLocation];
@@ -1079,7 +1109,7 @@ static CGFloat const toolbarHeight = 44.0f;
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
-    CGPoint touchLocation = [touch locationInView:touch.view];
+    CGPoint touchLocation = [touch locationInView:self.rootDotContainer];
     
     if (CGRectContainsPoint(self.rootDotContainer.frame, [touch locationInView:self.view])) {
         [self checkForDotsAtPoint:touchLocation];
@@ -1137,6 +1167,14 @@ static CGFloat const toolbarHeight = 44.0f;
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)stopArtwork {
+    _automating = NO;
+    _automationGeneration++;
+    [self.displayLink invalidate];
+    self.displayLink = nil;
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)dealloc {

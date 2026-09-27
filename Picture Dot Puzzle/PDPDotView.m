@@ -9,6 +9,7 @@
 #import "PDPDotView.h"
 #import "PDPDataManager.h"
 #import "UIImage+PixelInformation.h"
+#import "PDPRenderCore.h"
 
 @interface PDPDotView ()
 
@@ -31,27 +32,23 @@ static NSInteger const numberOfSubdivisions = 2;
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-
-    if (self) {
-        [self addTarget:self
-                 action:@selector(dragged:)
-       forControlEvents:UIControlEventTouchDragEnter | UIControlEventTouchDragExit];
-
-        self.dotNumber = [PDPDataManager sharedDataManager].dotNumber++;
-
-        self.layoutColor = YES;
-
-        self.relativeSize = CGSizeMake(1.0f,
-                                       1.0f);
-        self.relativeCenter = CGPointMake(0.5f,
-                                          0.5f);
-
-        // Mark as non-accessible element - there can be hundreds of dots
-        // Users interact with the canvas as a whole, not individual dots
-        self.isAccessibilityElement = NO;
-    }
-
+    if (self) [self configureDot];
     return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    self = [super initWithCoder:coder];
+    if (self) [self configureDot];
+    return self;
+}
+
+- (void)configureDot {
+    [self addTarget:self action:@selector(dragged:) forControlEvents:UIControlEventTouchDragEnter | UIControlEventTouchDragExit];
+    self.dotNumber = [PDPDataManager sharedDataManager].dotNumber++;
+    self.layoutColor = YES;
+    self.relativeSize = CGSizeMake(1, 1);
+    self.relativeCenter = CGPointMake(0.5, 0.5);
+    self.isAccessibilityElement = NO;
 }
 
 - (void)layoutSubviewsOnMainThread {
@@ -111,6 +108,7 @@ static NSInteger const numberOfSubdivisions = 2;
 }
 
 - (UIColor *)colorAtPoint:(CGPoint)center {
+    if (self.rootView.bounds.size.width <= 0 || self.rootView.bounds.size.height <= 0) return UIColor.clearColor;
     CGPoint relativeCenter = CGPointMake(center.x / self.rootView.frame.size.width,
                                          center.y / self.rootView.frame.size.height);
     UIImage *sourceImage = [[PDPDataManager sharedDataManager] image];
@@ -209,14 +207,7 @@ static NSInteger const numberOfSubdivisions = 2;
 }
 
 - (CGRect)frameForRow:(int)row column:(int)column {
-    CGFloat oddSizeBuffer = 0.0f;
-    if (numberOfSubdivisions % 2 > 0) {
-        oddSizeBuffer = 0.5f;
-    }
-    return CGRectMake(column * self.bounds.size.width / (float) numberOfSubdivisions + self.frame.origin.x,
-                      row * self.bounds.size.height / (float) numberOfSubdivisions + self.frame.origin.y,
-                      self.bounds.size.width / (float) numberOfSubdivisions + oddSizeBuffer,
-                      self.bounds.size.height / (float) numberOfSubdivisions + oddSizeBuffer);
+    return PDPSubdivisionFrame(self.frame, row, column);
 }
 
 - (UITapGestureRecognizer *)tap {

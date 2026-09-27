@@ -10,6 +10,10 @@
 
 @implementation UIImage (BlurredFrame)
 
+- (UIImage *)scaleToSize:(CGSize)newSize {
+    return [UIImage imageWithImage:self scaledToSize:newSize];
+}
+
 -(UIImage *)croppedImageAtFrame:(CGRect)frame
 {
     frame = CGRectMake(frame.origin.x * self.scale, frame.origin.y * self.scale, frame.size.width * self.scale, frame.size.height * self.scale);

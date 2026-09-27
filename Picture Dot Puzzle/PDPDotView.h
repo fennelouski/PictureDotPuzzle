@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) BOOL isDivided;
 
-@property (nonatomic, strong, nullable) UIView *rootView;
+@property (nonatomic, weak, nullable) UIView *rootView;
 
 @property (nonatomic) NSInteger divisionLevel;
 

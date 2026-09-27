@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PDPDataManager : NSObject
 
-+ (instancetype)sharedDataManager;
++ (instancetype)sharedDataManager NS_SWIFT_NAME(shared());
 
 /**
  *  The RATIO of the corner radius. Implemented corner radius is relative to the view it's bein applied to, but the ratio is instantaneous and global. Changing this value does not retroactively update views that have already used this value to set their corner radius.

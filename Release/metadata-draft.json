@@ -1,0 +1,34 @@
+{
+  "name": "Circles to the Max",
+  "apple_id": "1071902904",
+  "bundle_id": "com.nathanfennel.circlestothemax",
+  "platform": "iOS",
+  "version": "1.1",
+  "build": "2",
+  "subtitle": "Turn photos into circle art",
+  "primary_category": "Photo & Video",
+  "secondary_category": "Entertainment",
+  "description": "Reveal your photos one circle at a time. Touch and drag across the canvas to divide large circles into smaller details, then adjust the shape of new circles with the slider.\n\nChoose a photo or start with a sample image. Watch an automatic reveal, pause it to add your own touches, reset the canvas, and share your artwork as an image.\n\nSet your preferred appearance and animation timing. Photos are processed on your device, with no account or subscription. Artwork is temporary until you share it; returning home resets the canvas.",
+  "keywords": "circle,photo,art,pixel,mosaic,image,creative,shape,reveal",
+  "support_url": "https://nathanfennel.com/contact",
+  "privacy_url": "https://nathanfennel.com/circles-to-the-max/privacy.html",
+  "whats_new": "New home and settings screens, updated photo handling, and fixes for circle colors, animation, sharing and current iOS builds.",
+  "review_notes": "No sign-in or paid unlock. Open Canvas to try a bundled sample or choose a photo with the system photo picker. Touch or drag to subdivide circles. Use the slider for the shape of new circles, Play/Pause for automated detail, Reset to begin again and Share to export. Home requests confirmation before clearing the canvas. Settings controls real animation timing and appearance. No server is required.",
+  "data_handling": [
+    "Selected photos and rendered canvas remain on device and in memory.",
+    "System sharing exports an image only when chosen by the user.",
+    "UserDefaults stores appearance, animation settings and existing launch count.",
+    "No developer backend, account, advertising, analytics, IAP or cloud sync."
+  ],
+  "age_rating_source_review": {
+    "mature_content": false,
+    "public_ugc_chat": false,
+    "gambling": false,
+    "ads": false,
+    "unrestricted_browser": false,
+    "samples": "Eight existing images visually checked: sunset, rose, figurine, apple, Earth, building, baseball and city street.",
+    "note": "Source findings inform the actual Apple questionnaire; no final rating attestation by source agent."
+  },
+  "content_rights_limit": "Eight original photos retained unchanged. Original app used same assets; no specific authorship/license record in source or EXIF. No rights violation established or ownership invented. Existing Icalia Labs code has attribution but no separate license file.",
+  "validation_limit": "Signed archive/headless checks are separate from required native workflows, screenshots and upload."
+}

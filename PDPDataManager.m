@@ -8,6 +8,7 @@
 
 #import "PDPDataManager.h"
 #import "UIImage+BlurredFrame.h"
+#import "Picture Dot Puzzle/PDPRenderCore.h"
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
@@ -48,23 +49,15 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
             self.image = [UIImage imageNamed:[NSString stringWithFormat:@"%d.jpg", arc4random_uniform(8) + 1]];
         }
         
-        self.animationDuration = [defaults floatForKey:animationDurationKey];
-        if (self.animationDuration == 0.0f) {
-            self.animationDuration = 0.35f;
-        }
+        self.animationDuration = [defaults objectForKey:animationDurationKey] ? [defaults doubleForKey:animationDurationKey] : 0.35;
         
-        self.automationDuration = [defaults floatForKey:automationDurationKey];
-        if (self.automationDuration == 0.0f) {
-            self.automationDuration = 6.0f;
-        }
+        self.automationDuration = [defaults objectForKey:automationDurationKey] ? [defaults doubleForKey:automationDurationKey] : 6.0;
         
         _maximumDivisionLevel = [defaults integerForKey:maximumDivisionLevelKey];
         _totalNumberOfDotsPossible = [defaults integerForKey:totalNumberOfDotsPossibleKey];
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self calculateMaximumDivisionLevel];
-        });
-        
+        [self calculateMaximumDivisionLevel];
+
         self.allDots = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory
                                                    capacity:_maximumDivisionLevel];
         self.reserveDots = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory
@@ -76,28 +69,19 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
 }
 
 - (void)calculateMaximumDivisionLevel {
-    if ([UIApplication sharedApplication].keyWindow.frame.size.width > 92024.0f) {
-        self.maximumDivisionLevel = 8;
-        _totalNumberOfDotsPossible = 87380;
-    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 91024.0f) {
-        self.maximumDivisionLevel = 7;
-        _totalNumberOfDotsPossible = 21844;
-    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 400.0f) {
-        self.maximumDivisionLevel = 6;
-        _totalNumberOfDotsPossible = 5460;
-    } else if ([UIApplication sharedApplication].keyWindow.frame.size.width > 300.0f) {
-        self.maximumDivisionLevel = 5;
-        _totalNumberOfDotsPossible = 1364;
-    } else {
-        self.maximumDivisionLevel = 4;
-        _totalNumberOfDotsPossible = 600;
-    }
-    
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setInteger:self.maximumDivisionLevel
-                  forKey:maximumDivisionLevelKey];
-    [defaults setInteger:_totalNumberOfDotsPossible
-                  forKey:totalNumberOfDotsPossibleKey];
+    CGFloat width = MIN(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height);
+    self.maximumDivisionLevel = width > 400 ? 6 : width > 300 ? 5 : 4;
+    _totalNumberOfDotsPossible = PDPDotCount((unsigned)self.maximumDivisionLevel);
+}
+
+- (void)setAnimationDuration:(NSTimeInterval)value {
+    _animationDuration = MIN(1.0, MAX(0.05, value));
+    [NSUserDefaults.standardUserDefaults setDouble:_animationDuration forKey:animationDurationKey];
+}
+
+- (void)setAutomationDuration:(NSTimeInterval)value {
+    _automationDuration = MIN(20.0, MAX(2.0, value));
+    [NSUserDefaults.standardUserDefaults setDouble:_automationDuration forKey:automationDurationKey];
 }
 
 - (NSInteger)maximumDivisionLevel {
@@ -106,7 +90,8 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
 
 
 - (void)setMaximumDivisionLevel:(NSInteger)maximumDivisionLevel {
-    _maximumDivisionLevel = maximumDivisionLevel;
+    _maximumDivisionLevel = MIN(8, MAX(1, maximumDivisionLevel));
+    _totalNumberOfDotsPossible = PDPDotCount((unsigned)_maximumDivisionLevel);
 }
 
 - (NSInteger)totalNumberOfDotsPossible {
@@ -114,7 +99,7 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
 }
 
 - (float)progress {
-    return sqrtf((float)_dotNumber / (float)_totalNumberOfDotsPossible);
+    return PDPProgress(MAX(0, _dotNumber), MAX(0, _totalNumberOfDotsPossible));
 }
 
 
@@ -124,20 +109,17 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
 }
 
 - (void)setImage:(UIImage *)image {
-    _image = image;
-    
-    if (_image.size.width > [UIScreen mainScreen].bounds.size.width) {
-        _image = [UIImage imageWithImage:image scaledToSize:CGSizeMake([UIScreen mainScreen].bounds.size.width,
-                                                                       [UIScreen mainScreen].bounds.size.width)];
-    }
+    if (!image || image.size.width <= 0 || image.size.height <= 0) { _image = nil; return; }
+    CGFloat edge = MIN(1024, MIN(image.size.width * image.scale, image.size.height * image.scale));
+    CGSize size = CGSizeMake(edge, edge);
+    UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat defaultFormat];
+    format.scale = 1;
+    format.opaque = NO;
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:size format:format];
+    _image = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [image drawInRect:PDPAspectFillRect(image.size, size)];
+    }];
 }
-
-
-
-
-
-
-
 
 - (NSString *) platform{
     size_t size;
