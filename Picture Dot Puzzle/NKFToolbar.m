@@ -65,22 +65,11 @@ static CGSize const minimumToolbarSize = {44.0f, 44.0f};
     if (self.orientation == NKFToolbarOrientationHorizontal) {
         self.sizeWhileHorizontal = self.bounds.size;
         
-        NSMutableArray *updatedItems = [NSMutableArray new];
-        
         for (UIToolbar *toolbarContainer in self.verticalItemContainers) {
             [toolbarContainer removeFromSuperview];
-            
-            if (toolbarContainer.items.count > 2) {
-                [updatedItems addObject:[toolbarContainer.items objectAtIndex:1]];
-                [updatedItems addObject:self.flexibleSpace];
-            }
         }
-        
-        if (updatedItems.count) [updatedItems removeLastObject];
-        
-        if (updatedItems.count) {
-            [self setItems:updatedItems
-                  animated:YES];
+        if (self.backupCopyOfItems && ![self.items isEqualToArray:self.backupCopyOfItems]) {
+            [super setItems:self.backupCopyOfItems animated:NO];
         }
         
         [super layoutSubviews];
