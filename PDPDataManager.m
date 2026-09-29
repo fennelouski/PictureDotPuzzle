@@ -40,14 +40,7 @@ static NSString * const automationDurationKey = @"Automation Duration K£y";
         self.cornerRadius = 0.5f;
         
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        
-        if ([defaults integerForKey:@"Number of loads"] < 2) {
-            self.image = [UIImage imageNamed:@"2.jpg"];
-            [defaults setInteger:[defaults integerForKey:@"Number of loads"] + 1
-                          forKey:@"Number of loads"];
-        } else {
-            self.image = [UIImage imageNamed:[NSString stringWithFormat:@"%d.jpg", arc4random_uniform(8) + 1]];
-        }
+        self.image = [UIImage imageNamed:@"OriginalSample.jpg"];
         
         self.animationDuration = [defaults objectForKey:animationDurationKey] ? [defaults doubleForKey:animationDurationKey] : 0.35;
         

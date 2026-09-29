@@ -1,6 +1,6 @@
 # Native verification and screenshot plan
 
-Use the actual Circles 1.1 build 2 on current iPhone and iPad. Do not use a drawing, prototype, older build or screenshot overlay as application evidence.
+Use the actual Circles 1.1 build 4 on current iPhone and iPad. Do not use a drawing, prototype, older build or screenshot overlay as application evidence.
 
 1. Open Home and Settings. Confirm real controls, readable Dynamic Type, persistent light/dark/system choice and animation changes after relaunch. Capture Home and Settings after their controls have been exercised.
 2. Choose Photo from Home. Cancel once, then select a photo the user owns. Check centered crop and orientation. Start the canvas and touch/drag over several regions. Capture the actual partially subdivided photo artwork with the toolbar visible.

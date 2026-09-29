@@ -4,7 +4,7 @@
   "bundle_id": "com.nathanfennel.circlestothemax",
   "platform": "iOS",
   "version": "1.1",
-  "build": "2",
+  "build": "4",
   "subtitle": "Turn photos into circle art",
   "primary_category": "Photo & Video",
   "secondary_category": "Entertainment",
@@ -17,8 +17,8 @@
   "data_handling": [
     "Selected photos and rendered canvas remain on device and in memory.",
     "System sharing exports an image only when chosen by the user.",
-    "UserDefaults stores appearance, animation settings and existing launch count.",
-    "No developer backend, account, advertising, analytics, IAP or cloud sync."
+    "No developer backend, account, advertising, analytics, IAP or cloud sync.",
+    "UserDefaults stores appearance and animation settings."
   ],
   "age_rating_source_review": {
     "mature_content": false,
@@ -26,9 +26,9 @@
     "gambling": false,
     "ads": false,
     "unrestricted_browser": false,
-    "samples": "Eight existing images visually checked: sunset, rose, figurine, apple, Earth, building, baseball and city street.",
+    "samples": "One original generated floral still-life image; no legacy sample JPGs are bundled.",
     "note": "Source findings inform the actual Apple questionnaire; no final rating attestation by source agent."
   },
-  "content_rights_limit": "Eight original photos retained unchanged. Original app used same assets; no specific authorship/license record in source or EXIF. No rights violation established or ownership invented. Existing Icalia Labs code has attribution but no separate license file.",
+  "content_rights_limit": "Build 4 replaces the eight legacy sample JPGs with one newly generated still-life image. Historical sample authorship remains undocumented, but those files are excluded from this build.",
   "validation_limit": "Signed archive/headless checks are separate from required native workflows, screenshots and upload."
 }
