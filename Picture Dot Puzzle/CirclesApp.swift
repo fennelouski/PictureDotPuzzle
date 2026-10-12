@@ -49,7 +49,7 @@ private struct CirclesHome: View {
                 .padding(24).frame(maxWidth: 620, alignment: .leading)
                 .frame(maxWidth: .infinity)
             }
-            .navigationTitle("Circles to the Max")
+            .navigationTitle("Circles")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
